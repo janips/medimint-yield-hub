@@ -44,7 +44,7 @@ function ProductDetail() {
 
       <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Benefits</p>
       <div className="bg-gradient-card space-y-2 rounded-2xl border border-white/10 p-4">
-        {product.benefits.map((b) => (
+        {product.benefits.map((b: string) => (
           <div key={b} className="flex items-center gap-2 text-sm">
             <Check size={14} className="text-success shrink-0" />
             <span>{b}</span>

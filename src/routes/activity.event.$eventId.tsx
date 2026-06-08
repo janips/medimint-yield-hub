@@ -65,5 +65,5 @@ function Row({ label, value, mono, link }: { label: string; value: string; mono?
       {link && <ChevronRight size={14} className="text-muted-foreground ml-2" />}
     </div>
   );
-  return link ? <Link to={link as never} as any>{inner}</Link> : inner;
+  return link ? <a href={link}>{inner}</a> : inner;
 }

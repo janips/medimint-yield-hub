@@ -110,7 +110,7 @@ function MachineDetailPage() {
 
       <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Linked Asset IDs</p>
       <div className="space-y-2">
-        {machine.assetIds.map((aid) => (
+        {machine.assetIds.map((aid: string) => (
           <Link key={aid} to="/assets/ids/$assetId" params={{ assetId: aid }} className="bg-gradient-card flex items-center justify-between rounded-2xl border border-white/10 p-3">
             <p className="font-mono text-sm">{aid}</p>
             <ChevronRight size={14} className="text-muted-foreground" />
