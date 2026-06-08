@@ -127,12 +127,26 @@ function MachineDetailPage() {
         <Row label="Avg Yield / Tx" value={`${machine.avgYieldPerTx} MDMT`} />
       </div>
 
-      <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Daily Transactions</p>
+      <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Daily Transactions · Last 7 days</p>
       <div className="bg-gradient-card rounded-3xl border border-white/10 p-4">
         <BarChart data={machine.dailyTx} labels={dayLabels} />
       </div>
 
-      <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Monthly Yield</p>
+      <div className="mt-5 mb-2 flex items-center justify-between">
+        <p className="text-muted-foreground text-[11px] uppercase tracking-wide">Daily Yield · Last 7 days</p>
+        <span className="text-success text-[10px]">Total +{machine.dailyYield.reduce((a: number, b: number) => a + b, 0).toFixed(2)} MDMT</span>
+      </div>
+      <div className="bg-gradient-card rounded-3xl border border-white/10 p-4">
+        <AreaChart data={machine.dailyYield} labels={dayLabels} />
+        <p className="text-muted-foreground mt-2 text-center text-[10px]">
+          Your share (~{ownershipPct.toFixed(2)}%): +{(machine.dailyYield.reduce((a: number, b: number) => a + b, 0) * (myTokens / machine.totalSupply)).toFixed(3)} MDMT this week
+        </p>
+      </div>
+
+      <div className="mt-5 mb-2 flex items-center justify-between">
+        <p className="text-muted-foreground text-[11px] uppercase tracking-wide">Monthly Yield · Last 6 months</p>
+        <span className="text-success text-[10px]">+{((machine.monthlyYield[5] - machine.monthlyYield[0]) / machine.monthlyYield[0] * 100).toFixed(1)}% growth</span>
+      </div>
       <div className="bg-gradient-card rounded-3xl border border-white/10 p-4">
         <AreaChart data={machine.monthlyYield} labels={monthLabels} />
       </div>

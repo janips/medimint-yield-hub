@@ -6,6 +6,9 @@ import { yieldEvents, machines, assetIds, portfolio, user } from "@/lib/mockData
 import { ShieldCheck, Search, Cpu, Layers, Download, Sparkles, BadgeCheck } from "lucide-react";
 
 export const Route = createFileRoute("/transparency")({
+  validateSearch: (s: Record<string, unknown>): { q?: string } => ({
+    q: typeof s.q === "string" ? s.q : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Transparency Hub — Medimint" },
@@ -16,7 +19,8 @@ export const Route = createFileRoute("/transparency")({
 });
 
 function TransparencyPage() {
-  const [q, setQ] = useState("");
+  const { q: initialQ } = Route.useSearch();
+  const [q, setQ] = useState(initialQ ?? "");
   const results = useMemo(() => {
     if (!q) return [];
     const lower = q.toLowerCase();
