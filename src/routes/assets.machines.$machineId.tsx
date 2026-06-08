@@ -249,12 +249,18 @@ function Row({ label, value, mono }: { label: string; value: string; mono?: bool
   );
 }
 
-function Mini({ label, value, accent, flashKey }: { label: string; value: string; accent?: boolean; flashKey?: number }) {
+function Mini({ label, value, accent, flashKey, liveValue, decimals = 2, prefix = "" }: { label: string; value?: string; accent?: boolean; flashKey?: number; liveValue?: number; decimals?: number; prefix?: string }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 p-3">
       <p className="text-muted-foreground text-[10px] uppercase tracking-wide">{label}</p>
       <p className={`font-display mt-1 text-base font-semibold tabular-nums ${accent ? "text-gradient-brand" : ""}`}>
-        {flashKey !== undefined ? <span key={flashKey} className="animate-yield-flash inline-block">{value}</span> : value}
+        {liveValue !== undefined ? (
+          <AnimatedNumber value={liveValue} decimals={decimals} prefix={prefix} />
+        ) : flashKey !== undefined ? (
+          <span key={flashKey} className="animate-yield-flash inline-block">{value}</span>
+        ) : (
+          value
+        )}
       </p>
     </div>
   );
