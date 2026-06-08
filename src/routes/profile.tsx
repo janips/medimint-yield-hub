@@ -28,7 +28,7 @@ function ProfilePage() {
       <div className="mt-5 grid grid-cols-3 gap-2">
         <Stat label="Tokens" value={portfolio.totalTokens.toLocaleString()} />
         <Stat label="Staked" value={portfolio.staked.toLocaleString()} />
-        <Stat label="Yield" value={live.lifetime.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} />
+        <Stat label="Yield" value={live.lifetime.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} flashKey={live.tick} />
       </div>
 
       <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Personal</p>
