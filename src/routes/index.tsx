@@ -5,7 +5,8 @@ import { AppShell } from "@/components/AppShell";
 import { AreaChart } from "@/components/AreaChart";
 import { HashChip } from "@/components/HashChip";
 import { portfolio, linkedAssets, yieldEvents, txSeries, yieldSeries, txSeries30, yieldSeries30, fmtUsd, user } from "@/lib/mockData";
-import { useEffect, useState, type ReactNode } from "react";
+import { useLiveYield } from "@/lib/liveYield";
+import { useState, type ReactNode } from "react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,13 +21,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const [range, setRange] = useState<"7D" | "30D" | "90D">("7D");
   const [graph, setGraph] = useState<"tx" | "yield">("tx");
-  const [liveYield, setLiveYield] = useState(portfolio.yieldToday);
-
-  // simulated live yield
-  useEffect(() => {
-    const id = setInterval(() => setLiveYield((v) => v + Math.random() * 0.02), 3500);
-    return () => clearInterval(id);
-  }, []);
+  const live = useLiveYield();
 
   const data = range === "30D" || range === "90D"
     ? (graph === "tx" ? txSeries30 : yieldSeries30)
@@ -67,14 +62,16 @@ function HomePage() {
         <div className="mt-5 grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <p className="text-muted-foreground text-[10px] tracking-wide uppercase">Yield Today</p>
-            <motion.p key={Math.floor(liveYield * 10)} initial={{ opacity: 0.6 }} animate={{ opacity: 1 }} className="font-display mt-1 text-lg font-semibold">
-              +{liveYield.toFixed(3)}
+            <motion.p key={live.tick} initial={{ opacity: 0.6, y: -2 }} animate={{ opacity: 1, y: 0 }} className="font-display mt-1 text-lg font-semibold tabular-nums">
+              +{live.today.toFixed(4)}
             </motion.p>
             <p className="text-muted-foreground text-[10px]">MDMT · live</p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <p className="text-muted-foreground text-[10px] tracking-wide uppercase">Lifetime Yield</p>
-            <p className="font-display mt-1 text-lg font-semibold">{portfolio.yieldLifetime.toLocaleString()}</p>
+            <motion.p key={`lt-${live.tick}`} initial={{ opacity: 0.7 }} animate={{ opacity: 1 }} className="font-display mt-1 text-lg font-semibold tabular-nums">
+              {live.lifetime.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 })}
+            </motion.p>
             <p className="text-muted-foreground text-[10px]">MDMT</p>
           </div>
         </div>

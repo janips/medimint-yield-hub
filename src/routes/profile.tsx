@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { HashChip } from "@/components/HashChip";
 import { user, linkedAssets, portfolio } from "@/lib/mockData";
+import { useLiveYield } from "@/lib/liveYield";
 import { Mail, Wallet, Cpu, ShieldCheck, Settings as SettingsIcon, ChevronRight, LogOut } from "lucide-react";
 
 export const Route = createFileRoute("/profile")({
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/profile")({
 });
 
 function ProfilePage() {
+  const live = useLiveYield();
   return (
     <AppShell title="Profile" back>
       <div className="bg-gradient-hero shadow-glow mt-4 rounded-3xl border border-white/10 p-5 text-center">
@@ -26,7 +28,7 @@ function ProfilePage() {
       <div className="mt-5 grid grid-cols-3 gap-2">
         <Stat label="Tokens" value={portfolio.totalTokens.toLocaleString()} />
         <Stat label="Staked" value={portfolio.staked.toLocaleString()} />
-        <Stat label="Yield" value={portfolio.yieldLifetime.toFixed(0)} />
+        <Stat label="Yield" value={live.lifetime.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} />
       </div>
 
       <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Personal</p>

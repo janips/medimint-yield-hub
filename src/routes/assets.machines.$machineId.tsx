@@ -3,7 +3,8 @@ import { AppShell } from "@/components/AppShell";
 import { AreaChart } from "@/components/AreaChart";
 import { BarChart } from "@/components/BarChart";
 import { HashChip } from "@/components/HashChip";
-import { findMachine, eventsForMachine, assetIds as allAssetIds, fmtMdmt } from "@/lib/mockData";
+import { findMachine, eventsForMachine, assetIds as allAssetIds, fmtMdmt, portfolio } from "@/lib/mockData";
+import { useLiveYield } from "@/lib/liveYield";
 import { Cpu, MapPin, Activity, Download, ChevronRight, ShieldCheck, Sparkles, CalendarClock, Wrench, Hash, TrendingUp, PieChart, Factory } from "lucide-react";
 
 export const Route = createFileRoute("/assets/machines/$machineId")({
@@ -44,10 +45,18 @@ function MachineDetailPage() {
 
   const myAssets = allAssetIds.filter((a) => a.machineId === machine.id);
   const myTokens = myAssets.reduce((sum, a) => sum + a.tokens, 0);
-  const myYieldLifetime = myAssets.reduce((sum, a) => sum + a.earned, 0);
+  const baseLifetime = myAssets.reduce((sum, a) => sum + a.earned, 0);
   const ownershipPct = (myTokens / machine.totalSupply) * 100;
-  const myYieldToday = machine.yieldToday * (myTokens / machine.totalSupply);
+  const live = useLiveYield();
+  // share of total portfolio yield that belongs to this machine — based on ownership weight
+  const machineShare = portfolio.yieldToday > 0
+    ? (machine.yieldToday * (myTokens / machine.totalSupply)) / portfolio.yieldToday
+    : 0;
+  const liveDeltaToday = (live.today - portfolio.yieldToday) * machineShare;
+  const liveDeltaLifetime = (live.lifetime - portfolio.yieldLifetime) * machineShare;
+  const myYieldToday = machine.yieldToday * (myTokens / machine.totalSupply) + Math.max(liveDeltaToday, 0);
   const myYieldMonth = machine.yieldMonth * (myTokens / machine.totalSupply);
+  const myYieldLifetime = baseLifetime + Math.max(liveDeltaLifetime, 0);
 
   return (
     <AppShell title={machine.id} subtitle={machine.type} back>
@@ -102,9 +111,9 @@ function MachineDetailPage() {
           </div>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <Mini label="Your Yield Today" value={`+${myYieldToday.toFixed(3)}`} accent />
+          <Mini label="Your Yield Today" value={`+${myYieldToday.toFixed(4)}`} accent />
           <Mini label="Your Yield 30D" value={`+${myYieldMonth.toFixed(2)}`} accent />
-          <Mini label="Lifetime Earned" value={`${myYieldLifetime.toFixed(1)}`} accent />
+          <Mini label="Lifetime Earned" value={`${myYieldLifetime.toFixed(3)}`} accent />
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[11px]">
           <CalendarClock size={12} className="text-primary" />
