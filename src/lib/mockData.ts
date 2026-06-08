@@ -138,6 +138,15 @@ export const machines: Machine[] = [
     dailyTx: [22, 26, 24, 28, 30, 28, 32],
     monthlyYield: [102, 108, 116, 120, 124, 128],
     assetIds: ["ASSET-000819", "ASSET-000901"],
+    totalSupply: 70000,
+    ownedSince: "Nov 19, 2024",
+    manufacturer: "Canon Medical",
+    serial: "CN-CT256-RUH-022",
+    commissioned: "Feb 28, 2023",
+    uptimePct: 99.1,
+    lifetimeTx: 11680,
+    lifetimeYield: 1524.8,
+    avgYieldPerTx: 0.131,
   },
 ];
 
