@@ -62,14 +62,16 @@ function HomePage() {
         <div className="mt-5 grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <p className="text-muted-foreground text-[10px] tracking-wide uppercase">Yield Today</p>
-            <motion.p key={Math.floor(liveYield * 10)} initial={{ opacity: 0.6 }} animate={{ opacity: 1 }} className="font-display mt-1 text-lg font-semibold">
-              +{liveYield.toFixed(3)}
+            <motion.p key={live.tick} initial={{ opacity: 0.6, y: -2 }} animate={{ opacity: 1, y: 0 }} className="font-display mt-1 text-lg font-semibold tabular-nums">
+              +{live.today.toFixed(4)}
             </motion.p>
             <p className="text-muted-foreground text-[10px]">MDMT · live</p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <p className="text-muted-foreground text-[10px] tracking-wide uppercase">Lifetime Yield</p>
-            <p className="font-display mt-1 text-lg font-semibold">{portfolio.yieldLifetime.toLocaleString()}</p>
+            <motion.p key={`lt-${live.tick}`} initial={{ opacity: 0.7 }} animate={{ opacity: 1 }} className="font-display mt-1 text-lg font-semibold tabular-nums">
+              {live.lifetime.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 })}
+            </motion.p>
             <p className="text-muted-foreground text-[10px]">MDMT</p>
           </div>
         </div>
