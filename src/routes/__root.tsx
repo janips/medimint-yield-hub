@@ -112,19 +112,39 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+const SPLASH_CSS = `
+  #medimint-splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(120% 80% at 50% 0%,#2a1a4a 0%,#1a1428 55%,#0f0a1e 100%);transition:opacity .45s ease;opacity:1;pointer-events:none}
+  #medimint-splash.medimint-splash--hide{opacity:0}
+  #medimint-splash img{width:104px;height:104px;border-radius:24px;box-shadow:0 20px 60px -20px rgba(139,92,246,.55);animation:medimint-splash-pop .6s cubic-bezier(.2,.8,.2,1) both}
+  #medimint-splash .medimint-splash__wm{font:600 13px/1 'Space Grotesk',system-ui,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#b5a3e0;opacity:.85}
+  #medimint-splash .medimint-splash__dot{width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#22d3ee);animation:medimint-splash-pulse 1.1s ease-in-out infinite}
+  @keyframes medimint-splash-pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes medimint-splash-pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.6);opacity:1}}
+`;
+
+const SPLASH_HIDE_JS = `(function(){function h(){var e=document.getElementById('medimint-splash');if(!e)return;e.classList.add('medimint-splash--hide');setTimeout(function(){e&&e.remove()},500)}if(document.readyState==='complete')setTimeout(h,400);else window.addEventListener('load',function(){setTimeout(h,250)});})();`;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
         <HeadContent />
+        <style dangerouslySetInnerHTML={{ __html: SPLASH_CSS }} />
       </head>
       <body>
+        <div id="medimint-splash" aria-hidden="true">
+          <img src="/icons/icon-192.png" alt="" width={104} height={104} />
+          <div className="medimint-splash__wm">Medimint</div>
+          <div className="medimint-splash__dot" />
+        </div>
         {children}
         <Scripts />
+        <script dangerouslySetInnerHTML={{ __html: SPLASH_HIDE_JS }} />
       </body>
     </html>
   );
 }
+
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
