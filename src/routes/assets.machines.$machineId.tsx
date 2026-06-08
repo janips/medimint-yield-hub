@@ -45,10 +45,18 @@ function MachineDetailPage() {
 
   const myAssets = allAssetIds.filter((a) => a.machineId === machine.id);
   const myTokens = myAssets.reduce((sum, a) => sum + a.tokens, 0);
-  const myYieldLifetime = myAssets.reduce((sum, a) => sum + a.earned, 0);
+  const baseLifetime = myAssets.reduce((sum, a) => sum + a.earned, 0);
   const ownershipPct = (myTokens / machine.totalSupply) * 100;
-  const myYieldToday = machine.yieldToday * (myTokens / machine.totalSupply);
+  const live = useLiveYield();
+  // share of total portfolio yield that belongs to this machine — based on ownership weight
+  const machineShare = portfolio.yieldToday > 0
+    ? (machine.yieldToday * (myTokens / machine.totalSupply)) / portfolio.yieldToday
+    : 0;
+  const liveDeltaToday = (live.today - portfolio.yieldToday) * machineShare;
+  const liveDeltaLifetime = (live.lifetime - portfolio.yieldLifetime) * machineShare;
+  const myYieldToday = machine.yieldToday * (myTokens / machine.totalSupply) + Math.max(liveDeltaToday, 0);
   const myYieldMonth = machine.yieldMonth * (myTokens / machine.totalSupply);
+  const myYieldLifetime = baseLifetime + Math.max(liveDeltaLifetime, 0);
 
   return (
     <AppShell title={machine.id} subtitle={machine.type} back>
