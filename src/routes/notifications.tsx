@@ -24,17 +24,30 @@ const CATS: { key: NotifType | "all"; label: string }[] = [
 
 function NotificationsPage() {
   const [list, setList] = useState<Notification[]>(seed);
+  const [readIds, setReadIds] = useState<Set<number>>(new Set());
   const [cat, setCat] = useState<NotifType | "all">("all");
   const [q, setQ] = useState("");
+  const live = useLiveYield();
+
+  const combined = useMemo(() => {
+    const liveItems = live.liveNotifications.map((n) => ({ ...n, read: readIds.has(n.id) }));
+    return [...liveItems, ...list];
+  }, [live.liveNotifications, list, readIds]);
 
   const filtered = useMemo(() => {
-    return list
+    return combined
       .filter((n) => cat === "all" || n.type === cat)
       .filter((n) => !q || (n.title + n.desc).toLowerCase().includes(q.toLowerCase()));
-  }, [list, cat, q]);
+  }, [combined, cat, q]);
 
-  const markAll = () => setList(list.map((n) => ({ ...n, read: true })));
-  const markOne = (id: number) => setList(list.map((n) => (n.id === id ? { ...n, read: true } : n)));
+  const markAll = () => {
+    setList(list.map((n) => ({ ...n, read: true })));
+    setReadIds(new Set(live.liveNotifications.map((n) => n.id)));
+  };
+  const markOne = (id: number) => {
+    setList(list.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    setReadIds((prev) => new Set(prev).add(id));
+  };
 
   return (
     <AppShell
