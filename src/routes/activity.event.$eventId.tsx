@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { HashChip } from "@/components/HashChip";
 import { findEvent } from "@/lib/mockData";
