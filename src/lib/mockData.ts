@@ -44,6 +44,15 @@ export interface Machine {
   dailyTx: number[];
   monthlyYield: number[];
   assetIds: string[];
+  totalSupply: number;
+  ownedSince: string;
+  manufacturer: string;
+  serial: string;
+  commissioned: string;
+  uptimePct: number;
+  lifetimeTx: number;
+  lifetimeYield: number;
+  avgYieldPerTx: number;
 }
 
 export const machines: Machine[] = [
