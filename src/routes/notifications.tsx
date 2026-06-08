@@ -52,7 +52,7 @@ function NotificationsPage() {
   return (
     <AppShell
       title="Notifications"
-      subtitle={`${list.filter((n) => !n.read).length} unread`}
+      subtitle={`${combined.filter((n) => !n.read).length} unread`}
       back
       right={
         <Link to="/settings" className="bg-card/60 grid h-10 w-10 place-items-center rounded-full border border-white/10">
