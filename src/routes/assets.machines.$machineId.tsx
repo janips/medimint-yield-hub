@@ -3,8 +3,8 @@ import { AppShell } from "@/components/AppShell";
 import { AreaChart } from "@/components/AreaChart";
 import { BarChart } from "@/components/BarChart";
 import { HashChip } from "@/components/HashChip";
-import { findMachine, eventsForMachine } from "@/lib/mockData";
-import { Cpu, MapPin, Activity, Download, ChevronRight, ShieldCheck, Sparkles } from "lucide-react";
+import { findMachine, eventsForMachine, assetIds as allAssetIds, fmtMdmt } from "@/lib/mockData";
+import { Cpu, MapPin, Activity, Download, ChevronRight, ShieldCheck, Sparkles, CalendarClock, Wrench, Hash, TrendingUp, PieChart, Factory } from "lucide-react";
 
 export const Route = createFileRoute("/assets/machines/$machineId")({
   head: ({ params }) => ({
@@ -42,6 +42,13 @@ function MachineDetailPage() {
   const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const monthLabels = ["Aug", "Sep", "Oct", "Nov", "Dec", "Jan"];
 
+  const myAssets = allAssetIds.filter((a) => a.machineId === machine.id);
+  const myTokens = myAssets.reduce((sum, a) => sum + a.tokens, 0);
+  const myYieldLifetime = myAssets.reduce((sum, a) => sum + a.earned, 0);
+  const ownershipPct = (myTokens / machine.totalSupply) * 100;
+  const myYieldToday = machine.yieldToday * (myTokens / machine.totalSupply);
+  const myYieldMonth = machine.yieldMonth * (myTokens / machine.totalSupply);
+
   return (
     <AppShell title={machine.id} subtitle={machine.type} back>
       <div className="bg-gradient-hero shadow-glow mt-4 rounded-3xl border border-white/10 p-5">
@@ -65,6 +72,61 @@ function MachineDetailPage() {
         </div>
       </div>
 
+      {/* Your Investment */}
+      <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
+        <PieChart size={11} /> Your Investment
+      </p>
+      <div className="bg-gradient-card rounded-3xl border border-white/10 p-5">
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-muted-foreground text-[11px]">Ownership Share</p>
+            <p className="font-display text-gradient-brand mt-1 text-4xl font-semibold">
+              {ownershipPct.toFixed(2)}%
+            </p>
+            <p className="text-muted-foreground mt-1 text-[11px]">
+              {myTokens.toLocaleString()} / {machine.totalSupply.toLocaleString()} MDMT
+            </p>
+          </div>
+          <div className="relative h-20 w-20">
+            <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="hsl(var(--muted))" strokeWidth="3" opacity="0.2" />
+              <circle
+                cx="18" cy="18" r="15.9" fill="none"
+                stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round"
+                strokeDasharray={`${Math.min(ownershipPct, 100)}, 100`}
+              />
+            </svg>
+            <div className="absolute inset-0 grid place-items-center text-[10px] font-semibold">
+              {ownershipPct.toFixed(1)}%
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <Mini label="Your Yield Today" value={`+${myYieldToday.toFixed(3)}`} accent />
+          <Mini label="Your Yield 30D" value={`+${myYieldMonth.toFixed(2)}`} accent />
+          <Mini label="Lifetime Earned" value={`${myYieldLifetime.toFixed(1)}`} accent />
+        </div>
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[11px]">
+          <CalendarClock size={12} className="text-primary" />
+          <span className="text-muted-foreground">Owned since</span>
+          <span className="ml-auto font-medium">{machine.ownedSince}</span>
+        </div>
+      </div>
+
+      {/* Machine Specs */}
+      <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
+        <Factory size={11} /> Machine Details
+      </p>
+      <div className="bg-gradient-card divide-y divide-white/5 rounded-2xl border border-white/10">
+        <Row label="Manufacturer" value={machine.manufacturer} />
+        <Row label="Serial Number" value={machine.serial} mono />
+        <Row label="Commissioned" value={machine.commissioned} />
+        <Row label="Uptime (30d)" value={`${machine.uptimePct}%`} />
+        <Row label="Lifetime Transactions" value={machine.lifetimeTx.toLocaleString()} />
+        <Row label="Lifetime Yield" value={fmtMdmt(machine.lifetimeYield)} />
+        <Row label="Avg Yield / Tx" value={`${machine.avgYieldPerTx} MDMT`} />
+      </div>
+
       <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Daily Transactions</p>
       <div className="bg-gradient-card rounded-3xl border border-white/10 p-4">
         <BarChart data={machine.dailyTx} labels={dayLabels} />
@@ -75,26 +137,46 @@ function MachineDetailPage() {
         <AreaChart data={machine.monthlyYield} labels={monthLabels} />
       </div>
 
-      <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Yield Events Timeline</p>
+      {/* Yield Event Ledger */}
+      <div className="mt-5 mb-2 flex items-center justify-between">
+        <p className="text-muted-foreground flex items-center gap-1 text-[11px] uppercase tracking-wide">
+          <Hash size={11} /> Yield Transactions
+        </p>
+        <span className="text-muted-foreground text-[10px]">{events.length} on-chain events</span>
+      </div>
       <div className="space-y-2">
         {events.length === 0 && <p className="text-muted-foreground text-xs">No events recorded.</p>}
-        {events.map((e) => (
-          <div key={e.eventId} className="bg-gradient-card flex items-center gap-3 rounded-2xl border border-white/10 p-3">
-            <span className="bg-gradient-brand grid h-9 w-9 place-items-center rounded-xl">
-              <Sparkles size={14} className="text-white" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">{e.timestamp}</p>
-                <p className="text-success text-sm font-semibold">+{e.amount.toFixed(3)}</p>
+        {events.map((e) => {
+          const yourShare = e.amount * (myTokens / machine.totalSupply);
+          return (
+            <Link
+              key={e.eventId}
+              to="/activity/event/$eventId"
+              params={{ eventId: e.eventId }}
+              className="bg-gradient-card block rounded-2xl border border-white/10 p-3"
+            >
+              <div className="flex items-center gap-3">
+                <span className="bg-gradient-brand grid h-9 w-9 shrink-0 place-items-center rounded-xl">
+                  <Sparkles size={14} className="text-white" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="truncate text-sm font-medium">{e.timestamp}</p>
+                    <p className="text-success text-sm font-semibold">+{e.amount.toFixed(3)}</p>
+                  </div>
+                  <div className="text-muted-foreground mt-0.5 flex items-center justify-between text-[10px]">
+                    <span className="font-mono">{e.eventId} · {e.assetId}</span>
+                    <span>Your share: <span className="text-foreground">+{yourShare.toFixed(4)}</span></span>
+                  </div>
+                </div>
               </div>
-              <div className="mt-1 flex items-center gap-2">
+              <div className="mt-2 flex items-center justify-between pl-12">
                 <HashChip hash={e.hash} full={e.fullHash} />
-                <span className="text-muted-foreground text-[10px]">{e.settlement}</span>
+                <SettlementPill status={e.settlement} />
               </div>
-            </div>
-          </div>
-        ))}
+            </Link>
+          );
+        })}
       </div>
 
       <Link to="/transparency" className="bg-gradient-card mt-5 flex items-center gap-3 rounded-2xl border border-white/10 p-4">
@@ -108,12 +190,20 @@ function MachineDetailPage() {
         <ChevronRight size={14} className="text-muted-foreground" />
       </Link>
 
-      <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Linked Asset IDs</p>
+      <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
+        <TrendingUp size={11} /> Your Linked Asset IDs
+      </p>
       <div className="space-y-2">
-        {machine.assetIds.map((aid: string) => (
-          <Link key={aid} to="/assets/ids/$assetId" params={{ assetId: aid }} className="bg-gradient-card flex items-center justify-between rounded-2xl border border-white/10 p-3">
-            <p className="font-mono text-sm">{aid}</p>
-            <ChevronRight size={14} className="text-muted-foreground" />
+        {myAssets.map((a) => (
+          <Link key={a.id} to="/assets/ids/$assetId" params={{ assetId: a.id }} className="bg-gradient-card flex items-center justify-between rounded-2xl border border-white/10 p-3">
+            <div>
+              <p className="font-mono text-sm">{a.id}</p>
+              <p className="text-muted-foreground text-[10px]">{a.tokens.toLocaleString()} MDMT · {a.ratePct}% APY</p>
+            </div>
+            <div className="text-right">
+              <p className="text-success text-xs font-semibold">+{a.earned.toFixed(1)}</p>
+              <p className="text-muted-foreground text-[10px]">earned</p>
+            </div>
           </Link>
         ))}
       </div>
@@ -121,7 +211,17 @@ function MachineDetailPage() {
       <button className="bg-gradient-brand shadow-glow mt-6 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-white">
         <Download size={14} /> Export Report
       </button>
+      <div className="h-4" />
     </AppShell>
+  );
+}
+
+function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex items-center justify-between px-4 py-3">
+      <p className="text-muted-foreground text-[11px]">{label}</p>
+      <p className={`text-xs ${mono ? "font-mono" : "font-medium"}`}>{value}</p>
+    </div>
   );
 }
 
@@ -145,4 +245,13 @@ function StatusPill({ status }: { status: "Active" | "Maintenance" | "Offline" }
       <Activity size={9} /> {status}
     </span>
   );
+}
+
+function SettlementPill({ status }: { status: "Settled" | "Pending" | "Confirming" }) {
+  const map = {
+    Settled: "bg-success/15 text-success",
+    Pending: "bg-warning/15 text-warning",
+    Confirming: "bg-primary/15 text-primary",
+  } as const;
+  return <span className={`rounded-full px-2 py-0.5 text-[9px] ${map[status]}`}>{status}</span>;
 }
