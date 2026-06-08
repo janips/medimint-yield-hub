@@ -42,6 +42,7 @@ export interface Machine {
   yieldMonth: number;
   trend: number[];
   dailyTx: number[];
+  dailyYield: number[];
   monthlyYield: number[];
   assetIds: string[];
   totalSupply: number;
