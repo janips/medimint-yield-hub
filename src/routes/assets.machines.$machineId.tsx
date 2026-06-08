@@ -3,7 +3,8 @@ import { AppShell } from "@/components/AppShell";
 import { AreaChart } from "@/components/AreaChart";
 import { BarChart } from "@/components/BarChart";
 import { HashChip } from "@/components/HashChip";
-import { findMachine, eventsForMachine, assetIds as allAssetIds, fmtMdmt } from "@/lib/mockData";
+import { findMachine, eventsForMachine, assetIds as allAssetIds, fmtMdmt, portfolio } from "@/lib/mockData";
+import { useLiveYield } from "@/lib/liveYield";
 import { Cpu, MapPin, Activity, Download, ChevronRight, ShieldCheck, Sparkles, CalendarClock, Wrench, Hash, TrendingUp, PieChart, Factory } from "lucide-react";
 
 export const Route = createFileRoute("/assets/machines/$machineId")({
