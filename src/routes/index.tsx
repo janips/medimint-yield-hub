@@ -21,13 +21,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const [range, setRange] = useState<"7D" | "30D" | "90D">("7D");
   const [graph, setGraph] = useState<"tx" | "yield">("tx");
-  const [liveYield, setLiveYield] = useState(portfolio.yieldToday);
-
-  // simulated live yield
-  useEffect(() => {
-    const id = setInterval(() => setLiveYield((v) => v + Math.random() * 0.02), 3500);
-    return () => clearInterval(id);
-  }, []);
+  const live = useLiveYield();
 
   const data = range === "30D" || range === "90D"
     ? (graph === "tx" ? txSeries30 : yieldSeries30)
