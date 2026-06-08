@@ -112,9 +112,9 @@ function MachineDetailPage() {
           </div>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <Mini label="Your Yield Today" value={`+${myYieldToday.toFixed(4)}`} accent flashKey={live.tick} />
+          <Mini label="Your Yield Today" accent liveValue={myYieldToday} decimals={4} prefix="+" />
           <Mini label="Your Yield 30D" value={`+${myYieldMonth.toFixed(2)}`} accent />
-          <Mini label="Lifetime Earned" value={`${myYieldLifetime.toFixed(3)}`} accent flashKey={live.tick} />
+          <Mini label="Lifetime Earned" accent liveValue={myYieldLifetime} decimals={3} />
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[11px]">
           <CalendarClock size={12} className="text-primary" />
