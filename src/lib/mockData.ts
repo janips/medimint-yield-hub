@@ -44,6 +44,15 @@ export interface Machine {
   dailyTx: number[];
   monthlyYield: number[];
   assetIds: string[];
+  totalSupply: number;
+  ownedSince: string;
+  manufacturer: string;
+  serial: string;
+  commissioned: string;
+  uptimePct: number;
+  lifetimeTx: number;
+  lifetimeYield: number;
+  avgYieldPerTx: number;
 }
 
 export const machines: Machine[] = [
@@ -60,6 +69,15 @@ export const machines: Machine[] = [
     dailyTx: [38, 44, 36, 48, 52, 41, 48],
     monthlyYield: [142, 156, 168, 174, 182, 196],
     assetIds: ["ASSET-000392", "ASSET-000418"],
+    totalSupply: 100000,
+    ownedSince: "Aug 14, 2024",
+    manufacturer: "Siemens Healthineers",
+    serial: "SH-MRI3T-DXB-003",
+    commissioned: "Mar 02, 2023",
+    uptimePct: 98.4,
+    lifetimeTx: 14820,
+    lifetimeYield: 2184.6,
+    avgYieldPerTx: 0.147,
   },
   {
     id: "CT-MUM-011",
@@ -74,6 +92,15 @@ export const machines: Machine[] = [
     dailyTx: [28, 32, 26, 34, 36, 30, 36],
     monthlyYield: [112, 118, 124, 132, 138, 144],
     assetIds: ["ASSET-000507", "ASSET-000612"],
+    totalSupply: 80000,
+    ownedSince: "Sep 22, 2024",
+    manufacturer: "GE Healthcare",
+    serial: "GE-CT128-MUM-011",
+    commissioned: "Jun 18, 2022",
+    uptimePct: 97.1,
+    lifetimeTx: 12440,
+    lifetimeYield: 1648.2,
+    avgYieldPerTx: 0.132,
   },
   {
     id: "MRI-SGP-007",
@@ -88,6 +115,15 @@ export const machines: Machine[] = [
     dailyTx: [24, 22, 26, 22, 18, 16, 12],
     monthlyYield: [98, 104, 112, 118, 122, 118],
     assetIds: ["ASSET-000724"],
+    totalSupply: 60000,
+    ownedSince: "Oct 05, 2024",
+    manufacturer: "Philips Healthcare",
+    serial: "PH-MRI15T-SGP-007",
+    commissioned: "Nov 11, 2021",
+    uptimePct: 92.6,
+    lifetimeTx: 10260,
+    lifetimeYield: 1356.4,
+    avgYieldPerTx: 0.128,
   },
   {
     id: "CT-RUH-022",
@@ -102,6 +138,15 @@ export const machines: Machine[] = [
     dailyTx: [22, 26, 24, 28, 30, 28, 32],
     monthlyYield: [102, 108, 116, 120, 124, 128],
     assetIds: ["ASSET-000819", "ASSET-000901"],
+    totalSupply: 70000,
+    ownedSince: "Nov 19, 2024",
+    manufacturer: "Canon Medical",
+    serial: "CN-CT256-RUH-022",
+    commissioned: "Feb 28, 2023",
+    uptimePct: 99.1,
+    lifetimeTx: 11680,
+    lifetimeYield: 1524.8,
+    avgYieldPerTx: 0.131,
   },
 ];
 
