@@ -62,11 +62,13 @@ function ProfilePage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, flashKey }: { label: string; value: string; flashKey?: number }) {
   return (
     <div className="bg-gradient-card rounded-xl border border-white/10 p-3 text-center">
       <p className="text-muted-foreground text-[10px] uppercase">{label}</p>
-      <p className="font-display mt-1 text-sm font-semibold">{value}</p>
+      <p className="font-display mt-1 text-sm font-semibold">
+        {flashKey !== undefined ? <span key={flashKey} className="animate-yield-flash inline-block">{value}</span> : value}
+      </p>
     </div>
   );
 }
