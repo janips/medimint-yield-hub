@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HashChip } from "@/components/HashChip";
 import { notifications as seed, type Notification, type NotifType } from "@/lib/mockData";
+import { useLiveYield } from "@/lib/liveYield";
 import { Sparkles, Coins, ShoppingBag, TrendingUp, Bell, Search, CheckCheck, Settings as SettingsIcon, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/notifications")({
