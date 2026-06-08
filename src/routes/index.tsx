@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Coins, Sparkles, TrendingUp, Cpu, Hash } from "lucide-react";
+import { ArrowUpRight, Coins, Sparkles, TrendingUp, Cpu, ShoppingBag, Layers, ShieldCheck } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { Sparkline } from "@/components/Sparkline";
 import { AreaChart } from "@/components/AreaChart";
-import { portfolio, linkedAssets, yieldEvents, txSeries, yieldSeries, fmtMdmt, fmtUsd, user } from "@/lib/mockData";
-import { useState } from "react";
+import { HashChip } from "@/components/HashChip";
+import { portfolio, linkedAssets, yieldEvents, txSeries, yieldSeries, txSeries30, yieldSeries30, fmtUsd, user } from "@/lib/mockData";
+import { useEffect, useState, type ReactNode } from "react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,14 +20,24 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const [range, setRange] = useState<"7D" | "30D" | "90D">("7D");
   const [graph, setGraph] = useState<"tx" | "yield">("tx");
-  const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const [liveYield, setLiveYield] = useState(portfolio.yieldToday);
+
+  // simulated live yield
+  useEffect(() => {
+    const id = setInterval(() => setLiveYield((v) => v + Math.random() * 0.02), 3500);
+    return () => clearInterval(id);
+  }, []);
+
+  const data = range === "30D" || range === "90D"
+    ? (graph === "tx" ? txSeries30 : yieldSeries30)
+    : (graph === "tx" ? txSeries : yieldSeries);
+  const labels = range === "7D" ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] : undefined;
 
   return (
     <AppShell>
       <p className="text-muted-foreground mt-2 text-xs">Good morning</p>
       <h2 className="font-display text-2xl font-semibold">{user.name} 👋</h2>
 
-      {/* Hero card */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -57,8 +67,10 @@ function HomePage() {
         <div className="mt-5 grid grid-cols-2 gap-3">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <p className="text-muted-foreground text-[10px] tracking-wide uppercase">Yield Today</p>
-            <p className="font-display mt-1 text-lg font-semibold">+{portfolio.yieldToday}</p>
-            <p className="text-muted-foreground text-[10px]">MDMT</p>
+            <motion.p key={Math.floor(liveYield * 10)} initial={{ opacity: 0.6 }} animate={{ opacity: 1 }} className="font-display mt-1 text-lg font-semibold">
+              +{liveYield.toFixed(3)}
+            </motion.p>
+            <p className="text-muted-foreground text-[10px]">MDMT · live</p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <p className="text-muted-foreground text-[10px] tracking-wide uppercase">Lifetime Yield</p>
@@ -68,33 +80,36 @@ function HomePage() {
         </div>
       </motion.div>
 
-      {/* Asset snapshot */}
-      <Link to="/assets" className="bg-gradient-card mt-4 flex items-center justify-between rounded-2xl border border-white/10 p-4">
-        <div className="flex items-center gap-3">
+      {/* Linked assets summary */}
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <Link to="/assets" className="bg-gradient-card flex items-center gap-3 rounded-2xl border border-white/10 p-3">
           <span className="bg-gradient-brand-soft grid h-10 w-10 place-items-center rounded-xl">
-            <Cpu size={18} />
+            <Cpu size={16} />
           </span>
           <div>
-            <p className="text-xs text-muted-foreground">Linked Assets</p>
-            <p className="text-sm font-medium">
-              {linkedAssets.machines} machines · {linkedAssets.assetIds} asset IDs
-            </p>
+            <p className="text-muted-foreground text-[10px] uppercase">Linked</p>
+            <p className="text-sm font-medium">{linkedAssets.machines} machines</p>
+            <p className="text-muted-foreground text-[10px]">{linkedAssets.assetIds} asset IDs · {portfolio.activeAssets} active</p>
           </div>
-        </div>
-        <div className="text-right">
-          <p className="text-xs text-muted-foreground">Staked</p>
-          <p className="text-sm font-medium">{portfolio.staked.toLocaleString()}</p>
-        </div>
-      </Link>
-
-      {/* Today highlights */}
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        <Highlight label="Tx Today" value="128" />
-        <Highlight label="Yield Events" value="128" />
-        <Highlight label="Top Machine" value="DXB-003" small />
+        </Link>
+        <Link to="/staking" className="bg-gradient-card flex items-center gap-3 rounded-2xl border border-white/10 p-3">
+          <span className="bg-gradient-brand-soft grid h-10 w-10 place-items-center rounded-xl">
+            <Coins size={16} />
+          </span>
+          <div>
+            <p className="text-muted-foreground text-[10px] uppercase">Staked</p>
+            <p className="text-sm font-medium">{portfolio.staked.toLocaleString()}</p>
+            <p className="text-muted-foreground text-[10px]">MDMT</p>
+          </div>
+        </Link>
       </div>
 
-      {/* Graph */}
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <Highlight label="Tx Today" value={String(portfolio.txToday)} />
+        <Highlight label="Yield Events" value={String(portfolio.yieldEventsToday)} />
+        <Highlight label="Top Machine" value={portfolio.topMachine} small />
+      </div>
+
       <section className="bg-gradient-card mt-5 rounded-3xl border border-white/10 p-4">
         <div className="flex items-center justify-between">
           <div className="bg-secondary/60 inline-flex rounded-full p-1 text-xs">
@@ -109,28 +124,27 @@ function HomePage() {
         </div>
         <div className="mt-2 flex items-baseline gap-2">
           <span className="font-display text-2xl font-semibold">
-            {graph === "tx" ? "966" : "100.8"}
+            {graph === "tx" ? data.reduce((a, b) => a + b, 0) : data.reduce((a, b) => a + b, 0).toFixed(1)}
           </span>
           <span className="text-muted-foreground text-xs">
-            {graph === "tx" ? "transactions · 7D" : "MDMT yield · 7D"}
+            {graph === "tx" ? `transactions · ${range}` : `MDMT yield · ${range}`}
           </span>
           <span className="text-success ml-auto text-xs">+12.4%</span>
         </div>
         <div className="mt-2">
-          <AreaChart data={graph === "tx" ? txSeries : yieldSeries} labels={labels} />
+          <AreaChart data={data} labels={labels} />
         </div>
       </section>
 
-      {/* Yield feed */}
       <section className="mt-5">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="font-display text-base font-semibold">Live Yield Feed</h3>
-          <Link to="/activity" className="text-xs text-muted-foreground">View all →</Link>
+          <Link to="/activity" className="text-muted-foreground text-xs">View all →</Link>
         </div>
         <div className="space-y-2">
           {yieldEvents.slice(0, 5).map((e, i) => (
             <motion.div
-              key={i}
+              key={e.eventId}
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
@@ -141,14 +155,12 @@ function HomePage() {
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="truncate text-sm font-medium">{e.machine}</p>
+                  <p className="truncate font-mono text-sm font-medium">{e.machine}</p>
                   <p className="text-success text-sm font-semibold">+{e.amount.toFixed(3)}</p>
                 </div>
-                <div className="text-muted-foreground flex items-center gap-1.5 text-[11px]">
+                <div className="text-muted-foreground mt-0.5 flex items-center gap-2 text-[11px]">
                   <span>{e.time}</span>
-                  <span>·</span>
-                  <Hash size={10} />
-                  <span className="font-mono">{e.hash}</span>
+                  <HashChip hash={e.hash} full={e.fullHash} />
                 </div>
               </div>
             </motion.div>
@@ -156,11 +168,23 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Quick actions */}
       <section className="mt-5 grid grid-cols-2 gap-3">
-        <QuickAction icon={<Coins size={18} />} label="Stake MDMT" />
-        <QuickAction icon={<TrendingUp size={18} />} label="Claim Rewards" />
+        <QuickAction to="/staking" icon={<Coins size={18} />} label="Stake MDMT" />
+        <QuickAction to="/rewards" icon={<TrendingUp size={18} />} label="Claim Rewards" />
+        <QuickAction to="/marketplace" icon={<ShoppingBag size={18} />} label="Marketplace" />
+        <QuickAction to="/assets" icon={<Layers size={18} />} label="View Assets" />
       </section>
+
+      <Link to="/transparency" className="bg-gradient-card mt-4 flex items-center gap-3 rounded-2xl border border-white/10 p-4">
+        <span className="bg-gradient-brand-soft grid h-10 w-10 place-items-center rounded-xl">
+          <ShieldCheck size={16} />
+        </span>
+        <div className="flex-1">
+          <p className="text-sm font-medium">Transparency Hub</p>
+          <p className="text-muted-foreground text-[11px]">Verify every yield event on-chain</p>
+        </div>
+        <ArrowUpRight size={14} className="text-muted-foreground" />
+      </Link>
     </AppShell>
   );
 }
@@ -169,12 +193,12 @@ function Highlight({ label, value, small }: { label: string; value: string; smal
   return (
     <div className="bg-gradient-card rounded-2xl border border-white/10 p-3">
       <p className="text-muted-foreground text-[10px] tracking-wide uppercase">{label}</p>
-      <p className={`font-display mt-1 font-semibold ${small ? "text-sm" : "text-lg"}`}>{value}</p>
+      <p className={`font-display mt-1 truncate font-semibold ${small ? "text-xs" : "text-lg"}`}>{value}</p>
     </div>
   );
 }
 
-function ToggleBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function ToggleBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
   return (
     <button
       onClick={onClick}
@@ -187,15 +211,12 @@ function ToggleBtn({ active, onClick, children }: { active: boolean; onClick: ()
   );
 }
 
-function QuickAction({ icon, label }: { icon: React.ReactNode; label: string }) {
+function QuickAction({ to, icon, label }: { to: string; icon: ReactNode; label: string }) {
   return (
-    <button className="bg-gradient-card hover:border-primary/40 group flex items-center gap-3 rounded-2xl border border-white/10 p-4 transition-colors">
+    <Link to={to} className="bg-gradient-card hover:border-primary/40 group flex items-center gap-3 rounded-2xl border border-white/10 p-4 transition-colors">
       <span className="bg-gradient-brand-soft grid h-10 w-10 place-items-center rounded-xl">{icon}</span>
       <span className="text-sm font-medium">{label}</span>
       <ArrowUpRight size={14} className="text-muted-foreground ml-auto transition-transform group-hover:rotate-45" />
-    </button>
+    </Link>
   );
 }
-
-// silence unused import warning when sparkline unused here
-void Sparkline;

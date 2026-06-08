@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Sparkline } from "@/components/Sparkline";
-import { machines, assetIds, portfolio, fmtMdmt } from "@/lib/mockData";
+import { machines, assetIds, portfolio } from "@/lib/mockData";
 import { Cpu, Activity, MapPin, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/assets")({
@@ -48,21 +48,21 @@ function TokensTab() {
       <div className="bg-gradient-hero shadow-glow rounded-3xl border border-white/10 p-5">
         <p className="text-muted-foreground text-xs uppercase tracking-wide">Total MDMT</p>
         <p className="font-display mt-1 text-4xl font-semibold">{portfolio.totalTokens.toLocaleString()}</p>
-        <p className="text-success mt-1 text-xs">↗ +{portfolio.appreciationMonth}% this month</p>
+        <p className="text-success mt-1 text-xs">↗ +{portfolio.appreciationMonth}% est. this month</p>
         <div className="mt-5 grid grid-cols-2 gap-3">
           <Stat label="Available" value={portfolio.available.toLocaleString()} />
           <Stat label="Staked" value={portfolio.staked.toLocaleString()} />
-          <Stat label="Rewards Pending" value={portfolio.rewardsPending.toFixed(2)} />
-          <Stat label="Next Cycle" value="2d 14h" />
+          <Stat label="Pending Rewards" value={portfolio.rewardsPending.toFixed(2)} />
+          <Stat label="Next Reward" value="2d 14h" />
         </div>
       </div>
 
       <div className="bg-gradient-card rounded-2xl border border-white/10 p-4">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium">Token Performance</p>
-          <span className="text-success text-xs">+6.4%</span>
+          <span className="text-success text-xs">+6.4% / 30D</span>
         </div>
-        <p className="text-muted-foreground mt-1 text-xs">30-day trend</p>
+        <p className="text-muted-foreground mt-1 text-xs">Estimated appreciation trend</p>
         <div className="mt-2">
           <Sparkline data={[4.2, 4.4, 4.3, 4.6, 4.9, 5.1, 5.3, 5.6]} width={300} height={60} />
         </div>
@@ -75,7 +75,12 @@ function MachinesTab() {
   return (
     <div className="mt-5 space-y-3">
       {machines.map((m) => (
-        <div key={m.id} className="bg-gradient-card rounded-2xl border border-white/10 p-4">
+        <Link
+          key={m.id}
+          to="/assets/machines/$machineId"
+          params={{ machineId: m.id }}
+          className="bg-gradient-card block rounded-2xl border border-white/10 p-4"
+        >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <span className="bg-gradient-brand-soft grid h-11 w-11 place-items-center rounded-xl">
@@ -104,10 +109,10 @@ function MachinesTab() {
               <Sparkline data={m.trend} width={80} height={36} />
             </div>
           </div>
-          <button className="border-primary/30 text-primary mt-3 flex w-full items-center justify-center gap-1 rounded-xl border py-2 text-xs font-medium">
+          <div className="border-primary/30 text-primary mt-3 flex items-center justify-center gap-1 rounded-xl border py-2 text-xs font-medium">
             View Details <ChevronRight size={12} />
-          </button>
-        </div>
+          </div>
+        </Link>
       ))}
     </div>
   );
@@ -117,7 +122,12 @@ function AssetIdsTab() {
   return (
     <div className="mt-5 space-y-3">
       {assetIds.map((a) => (
-        <div key={a.id} className="bg-gradient-card rounded-2xl border border-white/10 p-4">
+        <Link
+          key={a.id}
+          to="/assets/ids/$assetId"
+          params={{ assetId: a.id }}
+          className="bg-gradient-card block rounded-2xl border border-white/10 p-4"
+        >
           <div className="flex items-center justify-between">
             <p className="font-mono text-sm font-semibold">{a.id}</p>
             <span className="text-success bg-success/10 rounded-full px-2 py-0.5 text-[10px]">
@@ -129,15 +139,15 @@ function AssetIdsTab() {
           </p>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <div>
-              <p className="text-muted-foreground text-[10px] uppercase">Tokens</p>
+              <p className="text-muted-foreground text-[10px] uppercase">Allocated</p>
               <p className="font-display text-base font-semibold">{a.tokens.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-[10px] uppercase">Yield Earned</p>
+              <p className="text-muted-foreground text-[10px] uppercase">Lifetime Yield</p>
               <p className="font-display text-base font-semibold">{a.earned.toFixed(1)}</p>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );
@@ -164,4 +174,3 @@ function StatusPill({ status }: { status: "Active" | "Maintenance" | "Offline" }
     </span>
   );
 }
-void fmtMdmt;

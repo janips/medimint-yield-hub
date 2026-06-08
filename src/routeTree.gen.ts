@@ -9,15 +9,56 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TransparencyRouteImport } from './routes/transparency'
+import { Route as StakingRouteImport } from './routes/staking'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RewardsRouteImport } from './routes/rewards'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as AssetsRouteImport } from './routes/assets'
 import { Route as ActivityRouteImport } from './routes/activity'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MarketplaceProductIdRouteImport } from './routes/marketplace.$productId'
+import { Route as MarketplaceCheckoutProductIdRouteImport } from './routes/marketplace.checkout.$productId'
+import { Route as AssetsMachinesMachineIdRouteImport } from './routes/assets.machines.$machineId'
+import { Route as AssetsIdsAssetIdRouteImport } from './routes/assets.ids.$assetId'
+import { Route as ActivityEventEventIdRouteImport } from './routes/activity.event.$eventId'
 
+const TransparencyRoute = TransparencyRouteImport.update({
+  id: '/transparency',
+  path: '/transparency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StakingRoute = StakingRouteImport.update({
+  id: '/staking',
+  path: '/staking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RewardsRoute = RewardsRouteImport.update({
   id: '/rewards',
   path: '/rewards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
@@ -40,52 +81,208 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceProductIdRoute = MarketplaceProductIdRouteImport.update({
+  id: '/$productId',
+  path: '/$productId',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
+const MarketplaceCheckoutProductIdRoute =
+  MarketplaceCheckoutProductIdRouteImport.update({
+    id: '/checkout/$productId',
+    path: '/checkout/$productId',
+    getParentRoute: () => MarketplaceRoute,
+  } as any)
+const AssetsMachinesMachineIdRoute = AssetsMachinesMachineIdRouteImport.update({
+  id: '/machines/$machineId',
+  path: '/machines/$machineId',
+  getParentRoute: () => AssetsRoute,
+} as any)
+const AssetsIdsAssetIdRoute = AssetsIdsAssetIdRouteImport.update({
+  id: '/ids/$assetId',
+  path: '/ids/$assetId',
+  getParentRoute: () => AssetsRoute,
+} as any)
+const ActivityEventEventIdRoute = ActivityEventEventIdRouteImport.update({
+  id: '/event/$eventId',
+  path: '/event/$eventId',
+  getParentRoute: () => ActivityRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/activity': typeof ActivityRoute
-  '/assets': typeof AssetsRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/activity': typeof ActivityRouteWithChildren
+  '/assets': typeof AssetsRouteWithChildren
+  '/marketplace': typeof MarketplaceRouteWithChildren
+  '/notifications': typeof NotificationsRoute
+  '/onboarding': typeof OnboardingRoute
+  '/profile': typeof ProfileRoute
   '/rewards': typeof RewardsRoute
+  '/settings': typeof SettingsRoute
+  '/staking': typeof StakingRoute
+  '/transparency': typeof TransparencyRoute
+  '/marketplace/$productId': typeof MarketplaceProductIdRoute
+  '/activity/event/$eventId': typeof ActivityEventEventIdRoute
+  '/assets/ids/$assetId': typeof AssetsIdsAssetIdRoute
+  '/assets/machines/$machineId': typeof AssetsMachinesMachineIdRoute
+  '/marketplace/checkout/$productId': typeof MarketplaceCheckoutProductIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/activity': typeof ActivityRoute
-  '/assets': typeof AssetsRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/activity': typeof ActivityRouteWithChildren
+  '/assets': typeof AssetsRouteWithChildren
+  '/marketplace': typeof MarketplaceRouteWithChildren
+  '/notifications': typeof NotificationsRoute
+  '/onboarding': typeof OnboardingRoute
+  '/profile': typeof ProfileRoute
   '/rewards': typeof RewardsRoute
+  '/settings': typeof SettingsRoute
+  '/staking': typeof StakingRoute
+  '/transparency': typeof TransparencyRoute
+  '/marketplace/$productId': typeof MarketplaceProductIdRoute
+  '/activity/event/$eventId': typeof ActivityEventEventIdRoute
+  '/assets/ids/$assetId': typeof AssetsIdsAssetIdRoute
+  '/assets/machines/$machineId': typeof AssetsMachinesMachineIdRoute
+  '/marketplace/checkout/$productId': typeof MarketplaceCheckoutProductIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/activity': typeof ActivityRoute
-  '/assets': typeof AssetsRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/activity': typeof ActivityRouteWithChildren
+  '/assets': typeof AssetsRouteWithChildren
+  '/marketplace': typeof MarketplaceRouteWithChildren
+  '/notifications': typeof NotificationsRoute
+  '/onboarding': typeof OnboardingRoute
+  '/profile': typeof ProfileRoute
   '/rewards': typeof RewardsRoute
+  '/settings': typeof SettingsRoute
+  '/staking': typeof StakingRoute
+  '/transparency': typeof TransparencyRoute
+  '/marketplace/$productId': typeof MarketplaceProductIdRoute
+  '/activity/event/$eventId': typeof ActivityEventEventIdRoute
+  '/assets/ids/$assetId': typeof AssetsIdsAssetIdRoute
+  '/assets/machines/$machineId': typeof AssetsMachinesMachineIdRoute
+  '/marketplace/checkout/$productId': typeof MarketplaceCheckoutProductIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/activity' | '/assets' | '/marketplace' | '/rewards'
+  fullPaths:
+    | '/'
+    | '/activity'
+    | '/assets'
+    | '/marketplace'
+    | '/notifications'
+    | '/onboarding'
+    | '/profile'
+    | '/rewards'
+    | '/settings'
+    | '/staking'
+    | '/transparency'
+    | '/marketplace/$productId'
+    | '/activity/event/$eventId'
+    | '/assets/ids/$assetId'
+    | '/assets/machines/$machineId'
+    | '/marketplace/checkout/$productId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/activity' | '/assets' | '/marketplace' | '/rewards'
-  id: '__root__' | '/' | '/activity' | '/assets' | '/marketplace' | '/rewards'
+  to:
+    | '/'
+    | '/activity'
+    | '/assets'
+    | '/marketplace'
+    | '/notifications'
+    | '/onboarding'
+    | '/profile'
+    | '/rewards'
+    | '/settings'
+    | '/staking'
+    | '/transparency'
+    | '/marketplace/$productId'
+    | '/activity/event/$eventId'
+    | '/assets/ids/$assetId'
+    | '/assets/machines/$machineId'
+    | '/marketplace/checkout/$productId'
+  id:
+    | '__root__'
+    | '/'
+    | '/activity'
+    | '/assets'
+    | '/marketplace'
+    | '/notifications'
+    | '/onboarding'
+    | '/profile'
+    | '/rewards'
+    | '/settings'
+    | '/staking'
+    | '/transparency'
+    | '/marketplace/$productId'
+    | '/activity/event/$eventId'
+    | '/assets/ids/$assetId'
+    | '/assets/machines/$machineId'
+    | '/marketplace/checkout/$productId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ActivityRoute: typeof ActivityRoute
-  AssetsRoute: typeof AssetsRoute
-  MarketplaceRoute: typeof MarketplaceRoute
+  ActivityRoute: typeof ActivityRouteWithChildren
+  AssetsRoute: typeof AssetsRouteWithChildren
+  MarketplaceRoute: typeof MarketplaceRouteWithChildren
+  NotificationsRoute: typeof NotificationsRoute
+  OnboardingRoute: typeof OnboardingRoute
+  ProfileRoute: typeof ProfileRoute
   RewardsRoute: typeof RewardsRoute
+  SettingsRoute: typeof SettingsRoute
+  StakingRoute: typeof StakingRoute
+  TransparencyRoute: typeof TransparencyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/transparency': {
+      id: '/transparency'
+      path: '/transparency'
+      fullPath: '/transparency'
+      preLoaderRoute: typeof TransparencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staking': {
+      id: '/staking'
+      path: '/staking'
+      fullPath: '/staking'
+      preLoaderRoute: typeof StakingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rewards': {
       id: '/rewards'
       path: '/rewards'
       fullPath: '/rewards'
       preLoaderRoute: typeof RewardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace': {
@@ -116,26 +313,96 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketplace/$productId': {
+      id: '/marketplace/$productId'
+      path: '/$productId'
+      fullPath: '/marketplace/$productId'
+      preLoaderRoute: typeof MarketplaceProductIdRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/marketplace/checkout/$productId': {
+      id: '/marketplace/checkout/$productId'
+      path: '/checkout/$productId'
+      fullPath: '/marketplace/checkout/$productId'
+      preLoaderRoute: typeof MarketplaceCheckoutProductIdRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
+    '/assets/machines/$machineId': {
+      id: '/assets/machines/$machineId'
+      path: '/machines/$machineId'
+      fullPath: '/assets/machines/$machineId'
+      preLoaderRoute: typeof AssetsMachinesMachineIdRouteImport
+      parentRoute: typeof AssetsRoute
+    }
+    '/assets/ids/$assetId': {
+      id: '/assets/ids/$assetId'
+      path: '/ids/$assetId'
+      fullPath: '/assets/ids/$assetId'
+      preLoaderRoute: typeof AssetsIdsAssetIdRouteImport
+      parentRoute: typeof AssetsRoute
+    }
+    '/activity/event/$eventId': {
+      id: '/activity/event/$eventId'
+      path: '/event/$eventId'
+      fullPath: '/activity/event/$eventId'
+      preLoaderRoute: typeof ActivityEventEventIdRouteImport
+      parentRoute: typeof ActivityRoute
+    }
   }
 }
 
+interface ActivityRouteChildren {
+  ActivityEventEventIdRoute: typeof ActivityEventEventIdRoute
+}
+
+const ActivityRouteChildren: ActivityRouteChildren = {
+  ActivityEventEventIdRoute: ActivityEventEventIdRoute,
+}
+
+const ActivityRouteWithChildren = ActivityRoute._addFileChildren(
+  ActivityRouteChildren,
+)
+
+interface AssetsRouteChildren {
+  AssetsIdsAssetIdRoute: typeof AssetsIdsAssetIdRoute
+  AssetsMachinesMachineIdRoute: typeof AssetsMachinesMachineIdRoute
+}
+
+const AssetsRouteChildren: AssetsRouteChildren = {
+  AssetsIdsAssetIdRoute: AssetsIdsAssetIdRoute,
+  AssetsMachinesMachineIdRoute: AssetsMachinesMachineIdRoute,
+}
+
+const AssetsRouteWithChildren =
+  AssetsRoute._addFileChildren(AssetsRouteChildren)
+
+interface MarketplaceRouteChildren {
+  MarketplaceProductIdRoute: typeof MarketplaceProductIdRoute
+  MarketplaceCheckoutProductIdRoute: typeof MarketplaceCheckoutProductIdRoute
+}
+
+const MarketplaceRouteChildren: MarketplaceRouteChildren = {
+  MarketplaceProductIdRoute: MarketplaceProductIdRoute,
+  MarketplaceCheckoutProductIdRoute: MarketplaceCheckoutProductIdRoute,
+}
+
+const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
+  MarketplaceRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ActivityRoute: ActivityRoute,
-  AssetsRoute: AssetsRoute,
-  MarketplaceRoute: MarketplaceRoute,
+  ActivityRoute: ActivityRouteWithChildren,
+  AssetsRoute: AssetsRouteWithChildren,
+  MarketplaceRoute: MarketplaceRouteWithChildren,
+  NotificationsRoute: NotificationsRoute,
+  OnboardingRoute: OnboardingRoute,
+  ProfileRoute: ProfileRoute,
   RewardsRoute: RewardsRoute,
+  SettingsRoute: SettingsRoute,
+  StakingRoute: StakingRoute,
+  TransparencyRoute: TransparencyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

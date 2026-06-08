@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { marketplace } from "@/lib/mockData";
-import { Search } from "lucide-react";
+import { marketplace, marketCategories } from "@/lib/mockData";
+import { Search, Star } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace")({
   head: () => ({
@@ -14,23 +14,27 @@ export const Route = createFileRoute("/marketplace")({
   component: MarketPage,
 });
 
-const categories = ["All", "Diagnostics", "Consultation", "Wellness", "Supplements"];
-
 function MarketPage() {
   const [cat, setCat] = useState("All");
-  const items = cat === "All" ? marketplace : marketplace.filter((m) => m.category === cat);
+  const [q, setQ] = useState("");
+  const items = marketplace
+    .filter((m) => cat === "All" || m.category === cat)
+    .filter((m) => !q || (m.title + m.blurb).toLowerCase().includes(q.toLowerCase()));
+
   return (
     <AppShell title="Marketplace" subtitle="Pay with MDMT">
       <div className="bg-card/60 mt-4 flex items-center gap-2 rounded-2xl border border-white/10 px-3 py-2.5">
         <Search size={14} className="text-muted-foreground" />
         <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
           placeholder="Search services, packages…"
           className="placeholder:text-muted-foreground w-full bg-transparent text-sm outline-none"
         />
       </div>
 
       <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1">
-        {categories.map((c) => (
+        {marketCategories.map((c) => (
           <button
             key={c}
             onClick={() => setCat(c)}
@@ -45,34 +49,37 @@ function MarketPage() {
         ))}
       </div>
 
-      <div className="bg-gradient-hero mt-4 overflow-hidden rounded-3xl border border-white/10 p-5">
+      <Link to="/marketplace/$productId" params={{ productId: "m1" }} className="bg-gradient-hero mt-4 block overflow-hidden rounded-3xl border border-white/10 p-5">
         <p className="text-muted-foreground text-[10px] uppercase tracking-wide">Featured</p>
         <h3 className="font-display mt-1 text-xl font-semibold">Longevity Diagnostic Panel</h3>
         <p className="text-muted-foreground mt-1 text-xs">Full-body biomarker map · partner clinics in 12 cities.</p>
         <div className="mt-4 flex items-center justify-between">
           <span className="font-display text-2xl font-semibold">240 MDMT</span>
-          <button className="bg-gradient-brand shadow-glow rounded-full px-4 py-2 text-xs font-semibold text-white">
-            Pay with MDMT
-          </button>
+          <span className="bg-gradient-brand shadow-glow rounded-full px-4 py-2 text-xs font-semibold text-white">Explore</span>
         </div>
-      </div>
+      </Link>
 
       <div className="mt-5 grid grid-cols-2 gap-3">
         {items.map((m) => (
-          <div key={m.id} className="bg-gradient-card flex flex-col rounded-2xl border border-white/10 p-3">
+          <Link
+            key={m.id}
+            to="/marketplace/$productId"
+            params={{ productId: m.id }}
+            className="bg-gradient-card flex flex-col rounded-2xl border border-white/10 p-3"
+          >
             <div className="bg-gradient-brand-soft grid h-20 place-items-center rounded-xl text-3xl">
               {m.emoji}
             </div>
             <p className="text-muted-foreground mt-2 text-[10px] uppercase">{m.category}</p>
             <p className="mt-0.5 line-clamp-2 text-sm font-medium leading-tight">{m.title}</p>
-            <p className="text-muted-foreground mt-1 line-clamp-2 text-[11px]">{m.blurb}</p>
-            <div className="mt-3 flex items-center justify-between">
-              <span className="font-display text-sm font-semibold">{m.price} MDMT</span>
-              <button className="border-primary/40 text-primary rounded-full border px-3 py-1 text-[11px] font-medium">
-                Buy
-              </button>
+            <div className="text-muted-foreground mt-1 flex items-center gap-1 text-[10px]">
+              <Star size={9} className="fill-warning text-warning" /> {m.rating} · {m.reviewCount}
             </div>
-          </div>
+            <div className="mt-2 flex items-center justify-between">
+              <span className="font-display text-sm font-semibold">{m.price} MDMT</span>
+              <span className="border-primary/40 text-primary rounded-full border px-3 py-1 text-[11px] font-medium">Buy</span>
+            </div>
+          </Link>
         ))}
       </div>
     </AppShell>

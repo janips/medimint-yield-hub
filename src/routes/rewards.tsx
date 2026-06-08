@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { rewards, staking } from "@/lib/mockData";
-import { Footprints, Flame, Coins, Flame as Streak } from "lucide-react";
+import { Footprints, Flame, Coins, Flame as Streak, Check } from "lucide-react";
 
 export const Route = createFileRoute("/rewards")({
   head: () => ({
@@ -14,11 +15,11 @@ export const Route = createFileRoute("/rewards")({
 });
 
 function RewardsPage() {
+  const [claimed, setClaimed] = useState(false);
   const pct = Math.min(100, (rewards.steps / rewards.stepsGoal) * 100);
   const C = 2 * Math.PI * 70;
   return (
     <AppShell title="Rewards" subtitle="Move · Earn · Stake">
-      {/* Steps ring */}
       <div className="bg-gradient-hero shadow-glow relative mt-4 overflow-hidden rounded-3xl border border-white/10 p-5">
         <div className="flex items-center gap-5">
           <div className="relative">
@@ -53,10 +54,19 @@ function RewardsPage() {
             <Streak size={14} className="text-warning" />
             <span className="text-xs">{rewards.streak}-day streak</span>
           </div>
-          <button className="bg-gradient-brand rounded-full px-4 py-1.5 text-xs font-semibold text-white">
-            Claim {rewards.earnedToday} MDMT
+          <button
+            onClick={() => setClaimed(true)}
+            disabled={claimed}
+            className="bg-gradient-brand rounded-full px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
+          >
+            {claimed ? <span className="inline-flex items-center gap-1"><Check size={11}/> Claimed</span> : `Claim ${rewards.earnedToday} MDMT`}
           </button>
         </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <Card title="Monthly Earned" value={`${rewards.monthlyMdmt} MDMT`} />
+        <Card title="Weekly Streak" value={`${rewards.streak} days`} />
       </div>
 
       <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Earning Rate</p>
@@ -75,7 +85,7 @@ function RewardsPage() {
             </div>
             <div className="text-right">
               <p className="font-display text-sm font-semibold">+{r.mdmt}</p>
-              <p className={`text-[10px] ${r.status === "Credited" ? "text-success" : "text-warning"}`}>{r.status}</p>
+              <StatusPill status={r.status} />
             </div>
           </div>
         ))}
@@ -120,4 +130,13 @@ function Card({ title, value }: { title: string; value: string }) {
       <p className="font-display mt-1 text-base font-semibold">{value}</p>
     </div>
   );
+}
+
+function StatusPill({ status }: { status: "Pending" | "Credited" | "Claimed" }) {
+  const map = {
+    Pending: "text-warning",
+    Credited: "text-success",
+    Claimed: "text-muted-foreground",
+  } as const;
+  return <p className={`text-[10px] ${map[status]}`}>{status}</p>;
 }
