@@ -3,6 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { AreaChart } from "@/components/AreaChart";
 import { BarChart } from "@/components/BarChart";
 import { HashChip } from "@/components/HashChip";
+import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { findMachine, eventsForMachine, assetIds as allAssetIds, fmtMdmt, portfolio } from "@/lib/mockData";
 import { useLiveYield } from "@/lib/liveYield";
 import { Cpu, MapPin, Activity, Download, ChevronRight, ShieldCheck, Sparkles, CalendarClock, Wrench, Hash, TrendingUp, PieChart, Factory } from "lucide-react";
@@ -111,9 +112,9 @@ function MachineDetailPage() {
           </div>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <Mini label="Your Yield Today" value={`+${myYieldToday.toFixed(4)}`} accent flashKey={live.tick} />
+          <Mini label="Your Yield Today" accent liveValue={myYieldToday} decimals={4} prefix="+" />
           <Mini label="Your Yield 30D" value={`+${myYieldMonth.toFixed(2)}`} accent />
-          <Mini label="Lifetime Earned" value={`${myYieldLifetime.toFixed(3)}`} accent flashKey={live.tick} />
+          <Mini label="Lifetime Earned" accent liveValue={myYieldLifetime} decimals={3} />
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[11px]">
           <CalendarClock size={12} className="text-primary" />
@@ -248,12 +249,18 @@ function Row({ label, value, mono }: { label: string; value: string; mono?: bool
   );
 }
 
-function Mini({ label, value, accent, flashKey }: { label: string; value: string; accent?: boolean; flashKey?: number }) {
+function Mini({ label, value, accent, flashKey, liveValue, decimals = 2, prefix = "" }: { label: string; value?: string; accent?: boolean; flashKey?: number; liveValue?: number; decimals?: number; prefix?: string }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 p-3">
       <p className="text-muted-foreground text-[10px] uppercase tracking-wide">{label}</p>
       <p className={`font-display mt-1 text-base font-semibold tabular-nums ${accent ? "text-gradient-brand" : ""}`}>
-        {flashKey !== undefined ? <span key={flashKey} className="animate-yield-flash inline-block">{value}</span> : value}
+        {liveValue !== undefined ? (
+          <AnimatedNumber value={liveValue} decimals={decimals} prefix={prefix} />
+        ) : flashKey !== undefined ? (
+          <span key={flashKey} className="animate-yield-flash inline-block">{value}</span>
+        ) : (
+          value
+        )}
       </p>
     </div>
   );

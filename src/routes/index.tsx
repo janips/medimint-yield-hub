@@ -4,6 +4,7 @@ import { ArrowUpRight, Coins, Sparkles, TrendingUp, Cpu, ShoppingBag, Layers, Sh
 import { AppShell } from "@/components/AppShell";
 import { AreaChart } from "@/components/AreaChart";
 import { HashChip } from "@/components/HashChip";
+import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { portfolio, linkedAssets, yieldEvents, txSeries, yieldSeries, txSeries30, yieldSeries30, fmtUsd, user } from "@/lib/mockData";
 import { useLiveYield } from "@/lib/liveYield";
 import { useState, type ReactNode } from "react";
@@ -63,16 +64,14 @@ function HomePage() {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <p className="text-muted-foreground text-[10px] tracking-wide uppercase">Yield Today</p>
             <p className="font-display mt-1 text-lg font-semibold tabular-nums">
-              <span key={live.tick} className="animate-yield-flash inline-block">+{live.today.toFixed(4)}</span>
+              <AnimatedNumber value={live.today} decimals={4} prefix="+" />
             </p>
             <p className="text-muted-foreground text-[10px]">MDMT · live</p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
             <p className="text-muted-foreground text-[10px] tracking-wide uppercase">Lifetime Yield</p>
             <p className="font-display mt-1 text-lg font-semibold tabular-nums">
-              <span key={`lt-${live.tick}`} className="animate-yield-flash inline-block">
-                {live.lifetime.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 })}
-              </span>
+              <AnimatedNumber value={live.lifetime} decimals={4} locale />
             </p>
             <p className="text-muted-foreground text-[10px]">MDMT</p>
           </div>
