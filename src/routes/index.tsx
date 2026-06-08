@@ -5,7 +5,8 @@ import { AppShell } from "@/components/AppShell";
 import { AreaChart } from "@/components/AreaChart";
 import { HashChip } from "@/components/HashChip";
 import { portfolio, linkedAssets, yieldEvents, txSeries, yieldSeries, txSeries30, yieldSeries30, fmtUsd, user } from "@/lib/mockData";
-import { useEffect, useState, type ReactNode } from "react";
+import { useLiveYield } from "@/lib/liveYield";
+import { useState, type ReactNode } from "react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
