@@ -11,6 +11,7 @@ export const Route = createFileRoute("/profile")({
 });
 
 function ProfilePage() {
+  const live = useLiveYield();
   return (
     <AppShell title="Profile" back>
       <div className="bg-gradient-hero shadow-glow mt-4 rounded-3xl border border-white/10 p-5 text-center">
