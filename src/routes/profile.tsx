@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { HashChip } from "@/components/HashChip";
 import { user, linkedAssets, portfolio } from "@/lib/mockData";
+import { useLiveYield } from "@/lib/liveYield";
 import { Mail, Wallet, Cpu, ShieldCheck, Settings as SettingsIcon, ChevronRight, LogOut } from "lucide-react";
 
 export const Route = createFileRoute("/profile")({
