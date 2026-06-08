@@ -124,3 +124,12 @@
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
+
+@keyframes yield-flash {
+  0%   { color: inherit; text-shadow: none; }
+  20%  { color: oklch(0.86 0.22 145); text-shadow: 0 0 14px oklch(0.86 0.22 145 / 0.65); }
+  100% { color: inherit; text-shadow: none; }
+}
+@utility animate-yield-flash {
+  animation: yield-flash 0.9s ease-out;
+}

@@ -28,7 +28,7 @@ function ProfilePage() {
       <div className="mt-5 grid grid-cols-3 gap-2">
         <Stat label="Tokens" value={portfolio.totalTokens.toLocaleString()} />
         <Stat label="Staked" value={portfolio.staked.toLocaleString()} />
-        <Stat label="Yield" value={live.lifetime.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} />
+        <Stat label="Yield" value={live.lifetime.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} flashKey={live.tick} />
       </div>
 
       <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Personal</p>
@@ -62,11 +62,13 @@ function ProfilePage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, flashKey }: { label: string; value: string; flashKey?: number }) {
   return (
     <div className="bg-gradient-card rounded-xl border border-white/10 p-3 text-center">
       <p className="text-muted-foreground text-[10px] uppercase">{label}</p>
-      <p className="font-display mt-1 text-sm font-semibold">{value}</p>
+      <p className="font-display mt-1 text-sm font-semibold">
+        {flashKey !== undefined ? <span key={flashKey} className="animate-yield-flash inline-block">{value}</span> : value}
+      </p>
     </div>
   );
 }
