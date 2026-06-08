@@ -134,12 +134,12 @@ function MachineDetailPage() {
 
       <div className="mt-5 mb-2 flex items-center justify-between">
         <p className="text-muted-foreground text-[11px] uppercase tracking-wide">Daily Yield · Last 7 days</p>
-        <span className="text-success text-[10px]">Total +{machine.dailyYield.reduce((a, b) => a + b, 0).toFixed(2)} MDMT</span>
+        <span className="text-success text-[10px]">Total +{machine.dailyYield.reduce((a: number, b: number) => a + b, 0).toFixed(2)} MDMT</span>
       </div>
       <div className="bg-gradient-card rounded-3xl border border-white/10 p-4">
         <AreaChart data={machine.dailyYield} labels={dayLabels} />
         <p className="text-muted-foreground mt-2 text-center text-[10px]">
-          Your share (~{ownershipPct.toFixed(2)}%): +{(machine.dailyYield.reduce((a, b) => a + b, 0) * (myTokens / machine.totalSupply)).toFixed(3)} MDMT this week
+          Your share (~{ownershipPct.toFixed(2)}%): +{(machine.dailyYield.reduce((a: number, b: number) => a + b, 0) * (myTokens / machine.totalSupply)).toFixed(3)} MDMT this week
         </p>
       </div>
 
