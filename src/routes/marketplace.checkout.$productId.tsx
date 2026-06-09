@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HashChip } from "@/components/HashChip";
 import {
-  findProduct, paymentMethods, portfolio, MDMT_TO_AED,
+  findProduct, paymentMethods, portfolio, MDMT_TO_AED, MDMT_TO_USD,
   type PaymentMethodId,
 } from "@/lib/mockData";
 import { Check, Download, ShoppingBag, CreditCard } from "lucide-react";
