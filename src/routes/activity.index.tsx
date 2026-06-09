@@ -5,7 +5,7 @@ import { HashChip } from "@/components/HashChip";
 import { yieldEvents, dailyTotals, notifications, machines } from "@/lib/mockData";
 import { Sparkles, Coins, ShoppingBag, TrendingUp, Bell, ChevronDown, ChevronRight, Filter } from "lucide-react";
 
-export const Route = createFileRoute("/activity")({
+export const Route = createFileRoute("/activity/")({
   head: () => ({
     meta: [
       { title: "Activity — Medimint" },
