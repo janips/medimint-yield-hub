@@ -78,6 +78,19 @@ function MarketPage() {
         </div>
       </Link>
 
+      {items.length === 0 ? (
+        <EmptyState
+          icon={<ShoppingBag size={20} />}
+          title="No products match"
+          description={q ? `No results for "${q}". Try a different keyword or category.` : "No products in this category yet."}
+          action={
+            <button
+              onClick={() => { setQ(""); setCat("All"); }}
+              className="bg-gradient-brand rounded-full px-4 py-2 text-xs font-semibold text-white"
+            >Clear filters</button>
+          }
+        />
+      ) : (
       <div className="mt-5 grid grid-cols-2 gap-3">
         {items.map((m) => (
           <Link
