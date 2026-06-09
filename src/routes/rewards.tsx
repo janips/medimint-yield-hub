@@ -77,7 +77,11 @@ function RewardsPage() {
 
       <p className="text-muted-foreground mt-6 mb-2 text-[11px] uppercase tracking-wide">Wellness Ledger</p>
       <div className="space-y-2">
-        {rewards.ledger.map((r) => (
+        {rewards.ledger.length === 0 ? (
+          <div className="bg-gradient-card rounded-2xl border border-white/10 p-6 text-center text-xs text-muted-foreground">
+            No activity logged yet. Move to earn MDMT.
+          </div>
+        ) : rewards.ledger.map((r) => (
           <div key={r.date} className="bg-gradient-card flex items-center justify-between rounded-2xl border border-white/10 p-3">
             <div>
               <p className="text-sm font-medium">{r.date}</p>
