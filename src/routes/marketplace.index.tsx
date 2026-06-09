@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { marketplace, marketCategories, paymentMethods, MDMT_TO_USD } from "@/lib/mockData";
 import { Search, Star, ShoppingBag } from "lucide-react";
 
-export const Route = createFileRoute("/marketplace")({
+export const Route = createFileRoute("/marketplace/")({
   head: () => ({
     meta: [
       { title: "Marketplace — Medimint" },
