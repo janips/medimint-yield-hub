@@ -7,7 +7,7 @@ import { machines, assetIds, portfolio, assetBuckets } from "@/lib/mockData";
 import { useSim } from "@/lib/simEngine";
 import { Cpu, Activity, MapPin, ChevronRight, Layers } from "lucide-react";
 
-export const Route = createFileRoute("/assets")({
+export const Route = createFileRoute("/assets/")({
   head: () => ({
     meta: [
       { title: "My Assets — Medimint" },
