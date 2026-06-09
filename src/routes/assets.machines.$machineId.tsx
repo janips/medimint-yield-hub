@@ -60,28 +60,124 @@ function MachineDetailPage() {
   const myYieldMonth = machine.yieldMonth * (myTokens / machine.totalSupply);
   const myYieldLifetime = baseLifetime + Math.max(liveDeltaLifetime, 0);
 
+  const bucket = machine.bucketId ? findBucket(machine.bucketId) : undefined;
+  const sim = useSim();
+  const liveMachineFeed = sim.feed.filter((t) => t.machineId === machine.id);
+  const liveYieldDelta = liveMachineFeed.reduce((a, t) => a + t.yieldMDMT, 0);
+  const liveRevenueToday = (machine.revenueGeneratedAED ?? machine.txToday * 150) + liveMachineFeed.reduce((a, t) => a + t.revenueAED, 0);
+
+  // Investor share data — falls back to allAssetIds-based ownership for older machines
+  const myStake = machine.myStake ?? myTokens;
+  const myPendingRewards = machine.myPendingRewards ?? +(myYieldToday * 0.6).toFixed(2);
+  const myRewardsEarned = machine.myRewardsEarned ?? myYieldLifetime;
+  const myStakeDate = machine.myStakeDate ?? machine.ownedSince;
+  const myOwnership = machine.totalStaked && machine.totalStaked > 0
+    ? (myStake / machine.totalStaked) * 100
+    : ownershipPct;
+
   return (
-    <AppShell title={machine.id} subtitle={machine.type} back>
+    <AppShell title={machine.id} subtitle={machine.name ?? machine.type} back>
       <div className="bg-gradient-hero shadow-glow mt-4 rounded-3xl border border-white/10 p-5">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-3">
             <span className="bg-gradient-brand-soft grid h-12 w-12 place-items-center rounded-xl">
               <Cpu size={20} />
             </span>
-            <div>
-              <p className="font-mono text-base font-semibold">{machine.id}</p>
+            <div className="min-w-0">
+              <p className="truncate font-mono text-base font-semibold">{machine.id}</p>
               <p className="text-muted-foreground flex items-center gap-1 text-[11px]"><MapPin size={11} /> {machine.location}</p>
+              {bucket && (
+                <Link to="/assets/buckets/$bucketId" params={{ bucketId: bucket.id }} className="text-primary mt-0.5 inline-flex items-center gap-1 text-[10px]">
+                  {bucket.name} <ChevronRight size={9} />
+                </Link>
+              )}
             </div>
           </div>
-          <StatusPill status={machine.status} />
+          <div className="flex flex-col items-end gap-1">
+            <StatusPill status={machine.status} />
+            {machine.badge && (
+              <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${
+                machine.badge === "Top Performing" ? "bg-gradient-brand text-white" : "bg-primary/20 text-primary"
+              }`}>{machine.badge}</span>
+            )}
+          </div>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <Mini label="Tx Today" value={String(machine.txToday)} />
-          <Mini label="Tx This Week" value={String(machine.txWeek)} />
-          <Mini label="Yield Today" value={`+${machine.yieldToday} MDMT`} accent />
-          <Mini label="Yield This Month" value={`+${machine.yieldMonth} MDMT`} accent />
+          <Mini label="Tx Week" value={String(machine.txWeek)} />
+          <Mini label="Tx Month" value={machine.txMonth?.toLocaleString() ?? "—"} />
+          <Mini label="Utilization" value={`${machine.utilizationPct ?? machine.uptimePct}%`} />
+          <Mini label="Current APY" value={`${machine.currentAPY ?? "—"}%`} accent />
+          <Mini label="Total Staked" value={machine.totalStaked ? `${machine.totalStaked.toLocaleString()} MDMT` : "—"} />
+          <Mini label="Investors" value={machine.numInvestors ? String(machine.numInvestors) : "—"} />
+          <Mini label="Launched" value={machine.launchDate ?? machine.commissioned} />
         </div>
       </div>
+
+      {/* My Investment — prominent */}
+      <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
+        <PieChart size={11} /> My Investment
+      </p>
+      <div className="bg-gradient-hero rounded-3xl border border-primary/20 p-5 shadow-glow">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <Mini label="My Stake" value={`${myStake.toLocaleString()} MDMT`} accent />
+          <Mini label="Stake Date" value={myStakeDate} />
+          <Mini label="My Ownership" value={`${myOwnership.toFixed(2)}%`} accent />
+          <Mini label="Rewards Earned" value={`+${myRewardsEarned.toFixed(2)} MDMT`} accent />
+          <Mini label="Pending Rewards" value={`+${myPendingRewards.toFixed(2)} MDMT`} />
+          <Mini label="Current Yield" accent liveValue={myYieldToday + liveYieldDelta * (myStake / (machine.totalStaked || 100000))} decimals={4} prefix="+" />
+        </div>
+      </div>
+
+      {/* Machine investor metrics */}
+      <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
+        <Users size={11} /> Machine Investor Metrics
+      </p>
+      <div className="bg-gradient-card rounded-3xl border border-white/10 p-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <Mini label="Total Investors" value={machine.numInvestors ? String(machine.numInvestors) : "—"} />
+          <Mini label="Total Staked" value={machine.totalStaked ? `${machine.totalStaked.toLocaleString()}` : "—"} />
+          <Mini label="Revenue Generated" value={`AED ${Math.round(liveRevenueToday).toLocaleString()}`} />
+          <Mini label="Rewards Distributed" value={fmtMdmt(machine.lifetimeYield * 0.7, 1)} />
+          <Mini label="Lifetime Yield" value={fmtMdmt(machine.lifetimeYield, 1)} accent />
+          <Mini label="Avg Investor Yield" value={machine.numInvestors ? `${(machine.lifetimeYield / machine.numInvestors).toFixed(2)} MDMT` : "—"} />
+        </div>
+      </div>
+
+      {/* Scan Activity */}
+      <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
+        <BarChart3 size={11} /> Scan Activity
+      </p>
+      <div className="bg-gradient-card rounded-3xl border border-white/10 p-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <Mini label="Scans Today" value={String(machine.scansToday ?? machine.txToday)} accent />
+          <Mini label="Scans Week" value={String(machine.scansWeek ?? machine.txWeek)} />
+          <Mini label="Scans Month" value={(machine.scansMonth ?? machine.txMonth ?? 0).toLocaleString()} />
+          <Mini label="Avg Daily" value={String(machine.avgDailyScans ?? Math.round(machine.txWeek / 7))} />
+        </div>
+        <div className="text-muted-foreground mt-3 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[11px]">
+          <Clock size={12} className="text-primary" />
+          <span>Peak hours</span>
+          <span className="ml-auto font-medium text-foreground">{machine.peakHours ?? "10:00–14:00"}</span>
+        </div>
+      </div>
+
+      {/* Rewards */}
+      <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
+        <Gift size={11} /> Rewards
+      </p>
+      <div className="bg-gradient-card rounded-3xl border border-white/10 p-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <Mini label="Rewards Today" value={`+${(myYieldToday).toFixed(3)}`} accent />
+          <Mini label="This Week" value={`+${(myYieldToday * 6.2).toFixed(2)}`} />
+          <Mini label="This Month" value={`+${(myYieldMonth).toFixed(2)}`} />
+          <Mini label="Lifetime" value={`+${myRewardsEarned.toFixed(1)}`} accent />
+        </div>
+        <div className="mt-3">
+          <AreaChart data={machine.monthlyYield} labels={monthLabels} />
+        </div>
+      </div>
+
 
       {/* Your Investment */}
       <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
