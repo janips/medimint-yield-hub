@@ -82,47 +82,58 @@ export interface SimState {
 /* ---------- machine catalog (extended; bucketized) ---------- */
 
 const BUCKET_FOR: Record<string, string> = {
-  "MRI-DXB-003": "alpha",
-  "MRI-DXB-014": "alpha",
-  "CT-DXB-002": "alpha",
-  "CT-MUM-011": "beta",
-  "LAB-MUM-021": "beta",
-  "MRI-SGP-007": "gamma",
-  "CT-RUH-022": "gamma",
-  "LAB-RUH-031": "gamma",
-  "CT-LON-009": "gamma",
+  "MRI-DXB-003": "dubai",
+  "MRI-DXB-014": "dubai",
+  "CT-DXB-002": "dubai",
+  "CT-MUM-011": "mumbai",
+  "LAB-MUM-021": "mumbai",
+  "CT-RUH-022": "abudhabi",
+  "ULTRA-AUH-041": "abudhabi",
+  "MAMMO-AMD-018": "ahmedabad",
+  "PET-AMD-009": "ahmedabad",
+  "MRI-SGP-007": "london",
+  "CT-LON-009": "london",
 };
 
 const SIM_MACHINES: SimMachine[] = [
-  // ALPHA — Dubai cluster
-  { id: "MRI-DXB-003", type: "MRI 3T", status: "Active", revenueBand: [220, 360], yieldRate: 0.020, hourly: 5.0, bucketId: "alpha" },
-  { id: "MRI-DXB-014", type: "MRI 1.5T", status: "Active", revenueBand: [180, 280], yieldRate: 0.019, hourly: 4.4, bucketId: "alpha" },
-  { id: "CT-DXB-002", type: "CT 128", status: "Active", revenueBand: [150, 260], yieldRate: 0.020, hourly: 5.6, bucketId: "alpha" },
-  // BETA — Mumbai cluster
-  { id: "CT-MUM-011", type: "CT 128", status: "Active", revenueBand: [120, 220], yieldRate: 0.022, hourly: 5.2, bucketId: "beta" },
-  { id: "LAB-MUM-021", type: "Pathology Lab", status: "Active", revenueBand: [30, 90], yieldRate: 0.024, hourly: 12, bucketId: "beta" },
-  // GAMMA — Riyadh / Singapore / London
-  { id: "MRI-SGP-007", type: "MRI 1.5T", status: "Maintenance", revenueBand: [200, 320], yieldRate: 0.018, hourly: 3.8, bucketId: "gamma" },
-  { id: "CT-RUH-022", type: "CT 256", status: "Active", revenueBand: [160, 280], yieldRate: 0.020, hourly: 5.4, bucketId: "gamma" },
-  { id: "LAB-RUH-031", type: "Pathology Lab", status: "Active", revenueBand: [25, 80], yieldRate: 0.024, hourly: 11, bucketId: "gamma" },
-  { id: "CT-LON-009", type: "CT 256", status: "Active", revenueBand: [180, 300], yieldRate: 0.020, hourly: 5.0, bucketId: "gamma" },
+  // DUBAI
+  { id: "MRI-DXB-003", type: "MRI 3T", status: "Active", revenueBand: [220, 360], yieldRate: 0.020, hourly: 5.0, bucketId: "dubai" },
+  { id: "MRI-DXB-014", type: "MRI 1.5T", status: "Active", revenueBand: [180, 280], yieldRate: 0.019, hourly: 4.4, bucketId: "dubai" },
+  { id: "CT-DXB-002", type: "CT 128", status: "Active", revenueBand: [150, 260], yieldRate: 0.020, hourly: 5.6, bucketId: "dubai" },
+  // MUMBAI
+  { id: "CT-MUM-011", type: "CT 128", status: "Active", revenueBand: [120, 220], yieldRate: 0.022, hourly: 5.2, bucketId: "mumbai" },
+  { id: "LAB-MUM-021", type: "Pathology Lab", status: "Active", revenueBand: [30, 90], yieldRate: 0.024, hourly: 12, bucketId: "mumbai" },
+  // ABU DHABI
+  { id: "CT-RUH-022", type: "CT 256", status: "Active", revenueBand: [160, 280], yieldRate: 0.020, hourly: 5.4, bucketId: "abudhabi" },
+  { id: "ULTRA-AUH-041", type: "Ultrasound", status: "Active", revenueBand: [60, 140], yieldRate: 0.021, hourly: 7.2, bucketId: "abudhabi" },
+  // AHMEDABAD
+  { id: "MAMMO-AMD-018", type: "Mammography", status: "Active", revenueBand: [80, 160], yieldRate: 0.022, hourly: 4.8, bucketId: "ahmedabad" },
+  { id: "PET-AMD-009", type: "PET Scan", status: "Active", revenueBand: [240, 420], yieldRate: 0.021, hourly: 3.4, bucketId: "ahmedabad" },
+  // LONDON
+  { id: "MRI-SGP-007", type: "MRI 1.5T", status: "Maintenance", revenueBand: [200, 320], yieldRate: 0.018, hourly: 3.8, bucketId: "london" },
+  { id: "CT-LON-009", type: "CT 256", status: "Active", revenueBand: [180, 300], yieldRate: 0.020, hourly: 5.0, bucketId: "london" },
 ];
 
 // Seed: ensure mock data machines are tagged
 seedMachines.forEach((m) => {
-  if (!BUCKET_FOR[m.id]) BUCKET_FOR[m.id] = "alpha";
+  if (!BUCKET_FOR[m.id]) BUCKET_FOR[m.id] = "dubai";
 });
 
 const TX_TYPES_BY_KIND: Record<string, TxType[]> = {
   MRI: ["Patient Scan", "Completed Scan", "Diagnostic Report"],
   CT: ["Patient Scan", "Completed Scan", "Diagnostic Report"],
   LAB: ["Lab Result", "Diagnostic Report"],
+  ULTRA: ["Patient Scan", "Completed Scan", "Diagnostic Report"],
+  MAMMO: ["Patient Scan", "Completed Scan", "Diagnostic Report"],
+  PET: ["Patient Scan", "Completed Scan", "Diagnostic Report"],
 };
 
 const ASSETS_FOR_BUCKET: Record<string, string[]> = {
-  alpha: ["ASSET-000392", "ASSET-000418", "ASSET-000507"],
-  beta: ["ASSET-000612", "ASSET-000724"],
-  gamma: ["ASSET-000819", "ASSET-000901", "ASSET-001044"],
+  dubai: ["ASSET-000392", "ASSET-000418"],
+  mumbai: ["ASSET-000507", "ASSET-000612"],
+  abudhabi: ["ASSET-000819", "ASSET-000901"],
+  ahmedabad: ["ASSET-001044"],
+  london: ["ASSET-000724"],
 };
 
 /** What fraction of platform yield accrues to the current user (mock investor). */
