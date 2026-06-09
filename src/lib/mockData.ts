@@ -33,13 +33,16 @@ export type MachineStatus = "Active" | "Maintenance" | "Offline";
 
 export interface Machine {
   id: string;
+  name?: string;
   type: string;
   location: string;
   status: MachineStatus;
   txToday: number;
   yieldToday: number;
   txWeek: number;
+  txMonth?: number;
   yieldMonth: number;
+  revenueGeneratedAED?: number;
   trend: number[];
   dailyTx: number[];
   dailyYield: number[];
@@ -47,13 +50,31 @@ export interface Machine {
   assetIds: string[];
   totalSupply: number;
   ownedSince: string;
+  launchDate?: string;
   manufacturer: string;
+  model?: string;
   serial: string;
   commissioned: string;
   uptimePct: number;
+  utilizationPct?: number;
   lifetimeTx: number;
   lifetimeYield: number;
   avgYieldPerTx: number;
+  currentAPY?: number;
+  totalStaked?: number;
+  numInvestors?: number;
+  badge?: "Top Performing" | "New" | null;
+  bucketId?: string;
+  // investor-specific
+  myStake?: number;
+  myStakeDate?: string;
+  myPendingRewards?: number;
+  myRewardsEarned?: number;
+  peakHours?: string;
+  avgDailyScans?: number;
+  scansToday?: number;
+  scansWeek?: number;
+  scansMonth?: number;
 }
 
 export const machines: Machine[] = [
