@@ -219,7 +219,28 @@ function buildInitial(): SimState {
   };
 }
 
-let state: SimState = buildInitial();
+/** Deterministic, empty snapshot used for SSR so the server-rendered HTML
+ *  matches the very first client paint (no Math.random() leaking into markup). */
+const SERVER_STATE: SimState = {
+  tick: 0,
+  todayTx: 906,
+  todayRevenueAED: 136_000,
+  todayYieldMDMT: 2_720,
+  lifetimeTx: 1_482_400,
+  lifetimeRevenueAED: 222_360_000,
+  lifetimeYieldMDMT: 4_447_200,
+  myYieldToday: portfolio.yieldToday,
+  myYieldLifetime: portfolio.yieldLifetime,
+  activeMachines: SIM_MACHINES.filter((m) => m.status === "Active").length,
+  maintenanceMachines: SIM_MACHINES.filter((m) => m.status === "Maintenance").length,
+  feed: [],
+  liveNotifications: [],
+  lastTx: undefined,
+  now: 0,
+};
+
+let state: SimState = SERVER_STATE;
+let initialized = false;
 const listeners = new Set<() => void>();
 let intervalId: ReturnType<typeof setInterval> | null = null;
 let nowId: ReturnType<typeof setInterval> | null = null;
@@ -250,13 +271,10 @@ function generateTick() {
     settlement: Math.random() < 0.82 ? "Settled" : Math.random() < 0.6 ? "Confirming" : "Pending",
   };
 
-  // Investor share of this yield
   const userDelta = +(yieldM * USER_SHARE).toFixed(4);
 
-  // Occasionally flip a machine into / out of maintenance (≈ every 60 ticks)
   if (Math.random() < 0.012) {
-    const candidates = SIM_MACHINES;
-    const flip = pick(candidates);
+    const flip = pick(SIM_MACHINES);
     if (flip.status === "Active") flip.status = "Maintenance";
     else if (flip.status === "Maintenance") flip.status = "Active";
   }
@@ -303,14 +321,29 @@ function generateTick() {
 
 function scheduleNext() {
   if (typeof window === "undefined") return;
-  // jitter between 8s and 18s for a believable cadence
   const delay = 8000 + Math.random() * 10_000;
   if (intervalId) clearTimeout(intervalId);
   intervalId = setTimeout(generateTick, delay);
 }
 
+function buildClientInitial(): SimState {
+  const feed: SimTransaction[] = [];
+  for (let i = 0; i < 12; i++) feed.push(seedTransaction(2000 + i * 9000));
+  return {
+    ...SERVER_STATE,
+    feed,
+    lastTx: feed[0],
+    now: Date.now(),
+  };
+}
+
 function ensureRunning() {
   if (typeof window === "undefined") return;
+  if (!initialized) {
+    state = buildClientInitial();
+    initialized = true;
+    emit();
+  }
   if (!intervalId) scheduleNext();
   if (!nowId) {
     nowId = setInterval(() => {
@@ -327,8 +360,9 @@ const subscribe = (l: () => void) => {
     listeners.delete(l);
   };
 };
+
 const getSnapshot = () => state;
-const getServerSnapshot = () => state;
+const getServerSnapshot = () => SERVER_STATE;
 
 export function useSim(): SimState {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);

@@ -100,7 +100,11 @@ function StakingPage() {
 
       <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Reward History</p>
       <div className="space-y-2">
-        {staking.history.map((h) => (
+        {staking.history.length === 0 ? (
+          <div className="bg-gradient-card rounded-2xl border border-white/10 p-6 text-center text-xs text-muted-foreground">
+            No reward history yet. Stake MDMT to start earning.
+          </div>
+        ) : staking.history.map((h) => (
           <div key={h.ref} className="bg-gradient-card flex items-center gap-3 rounded-2xl border border-white/10 p-3">
             <span className="bg-gradient-brand-soft grid h-9 w-9 place-items-center rounded-xl">
               <TrendingUp size={14} />
