@@ -4,9 +4,10 @@ import { AreaChart } from "@/components/AreaChart";
 import { BarChart } from "@/components/BarChart";
 import { HashChip } from "@/components/HashChip";
 import { AnimatedNumber } from "@/components/AnimatedNumber";
-import { findMachine, eventsForMachine, assetIds as allAssetIds, fmtMdmt, portfolio } from "@/lib/mockData";
+import { findMachine, eventsForMachine, assetIds as allAssetIds, fmtMdmt, portfolio, findBucket } from "@/lib/mockData";
 import { useLiveYield } from "@/lib/liveYield";
-import { Cpu, MapPin, Activity, Download, ChevronRight, ShieldCheck, Sparkles, CalendarClock, Wrench, Hash, TrendingUp, PieChart, Factory } from "lucide-react";
+import { useSim } from "@/lib/simEngine";
+import { Cpu, MapPin, Activity, Download, ChevronRight, ShieldCheck, Sparkles, CalendarClock, Hash, TrendingUp, PieChart, Factory, Users, Coins, Gift, Clock, Plus, History, BarChart3 } from "lucide-react";
 
 export const Route = createFileRoute("/assets/machines/$machineId")({
   head: ({ params }) => ({
