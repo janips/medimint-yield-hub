@@ -154,6 +154,3 @@ function Status({ status }: { status: "Active" | "Maintenance" | "Offline" }) {
   );
 }
 
-// Re-import (suppress unused-name lint via aliasing)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _kw = MapPin;
