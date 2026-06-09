@@ -358,6 +358,7 @@ function MachineDetailPage() {
           </div>
         </div>
       </div>
+    </AppShell>
   );
 }
 
