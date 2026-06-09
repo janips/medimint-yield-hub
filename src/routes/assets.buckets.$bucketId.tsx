@@ -1,0 +1,158 @@
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { AppShell } from "@/components/AppShell";
+import { AnimatedNumber } from "@/components/AnimatedNumber";
+import { RangeChart } from "@/components/RangeChart";
+import { LiveActivityFeed } from "@/components/LiveActivityFeed";
+import { findBucket, machines, fmtMdmt } from "@/lib/mockData";
+import { useSim, machinesInBucket, type BucketKey } from "@/lib/simEngine";
+import { Cpu, MapPin, Activity, Layers, ChevronRight, TrendingUp } from "lucide-react";
+
+export const Route = createFileRoute("/assets/buckets/$bucketId")({
+  head: ({ params }) => ({
+    meta: [
+      { title: `${params.bucketId.toUpperCase()} — Asset Bucket — Medimint` },
+      { name: "description", content: "Drill into the machines, transactions and yield inside this Asset Bucket." },
+    ],
+  }),
+  loader: ({ params }) => {
+    const bucket = findBucket(params.bucketId);
+    if (!bucket) throw notFound();
+    return { bucket };
+  },
+  component: BucketPage,
+  notFoundComponent: () => (
+    <AppShell title="Bucket not found" back>
+      <p className="text-muted-foreground mt-6 text-sm">This bucket doesn't exist.</p>
+      <Link to="/assets" className="text-primary mt-3 inline-block text-xs">← Back to assets</Link>
+    </AppShell>
+  ),
+});
+
+function BucketPage() {
+  const { bucket } = Route.useLoaderData();
+  const s = useSim();
+
+  // What share of the platform engine yield belongs to this bucket?
+  // Approximation: bucket's machine count / total machines, but scoped via simEngine machines.
+  const simMachines = machinesInBucket(bucket.id as BucketKey);
+  const txInBucket = s.feed.filter((t) => t.bucketId === bucket.id);
+  const todayYield = txInBucket.reduce((a, t) => a + t.yieldMDMT, 0);
+
+  // Linked physical machine records (for richer detail)
+  const machineRecords = machines.filter((m) => bucket.machineIds.includes(m.id));
+
+  return (
+    <AppShell title={bucket.name} subtitle={bucket.region} back wide>
+      <div className="bg-gradient-hero shadow-glow mt-4 rounded-3xl border border-white/10 p-5">
+        <div className="flex items-center justify-between">
+          <span className="bg-gradient-brand-soft inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium">
+            <Layers size={11} /> Bucket {bucket.id.toUpperCase()}
+          </span>
+          <span className="bg-success/15 text-success rounded-full px-2 py-0.5 text-[10px] font-medium">
+            {bucket.apyPct}% APY
+          </span>
+        </div>
+        <p className="text-muted-foreground mt-3 text-sm leading-relaxed">{bucket.thesis}</p>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <Tile label="Machines" value={String(bucket.machineIds.length)} />
+          <Tile label="My MDMT" value={bucket.myTokens.toLocaleString()} />
+          <Tile label="Lifetime Yield" value={fmtMdmt(bucket.lifetimeYield, 1)} accent />
+        </div>
+      </div>
+
+      <div className="lg:grid lg:grid-cols-2 lg:gap-5">
+        <div className="bg-gradient-card mt-4 rounded-3xl border border-white/10 p-5">
+          <p className="text-muted-foreground text-[11px] uppercase tracking-wide">Live performance · today</p>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            <Tile label="Tx (session)" value={String(txInBucket.length)} />
+            <Tile
+              label="Revenue (AED)"
+              live={<AnimatedNumber value={txInBucket.reduce((a, t) => a + t.revenueAED, 0)} decimals={0} locale />}
+            />
+            <Tile
+              label="Yield (MDMT)"
+              live={<AnimatedNumber value={todayYield} decimals={3} />}
+              accent
+            />
+          </div>
+        </div>
+        <RangeChart initial="tx" />
+      </div>
+
+      <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
+        <Cpu size={11} /> Machines in this bucket
+      </p>
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        {simMachines.map((sm) => {
+          const rec = machineRecords.find((r) => r.id === sm.id);
+          const machineTx = txInBucket.filter((t) => t.machineId === sm.id);
+          const machineYield = machineTx.reduce((a, t) => a + t.yieldMDMT, 0);
+          return (
+            <Link
+              key={sm.id}
+              to={rec ? "/assets/machines/$machineId" : "/assets"}
+              {...(rec ? { params: { machineId: sm.id } } : {})}
+              className="bg-gradient-card block rounded-2xl border border-white/10 p-4"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="bg-gradient-brand-soft grid h-10 w-10 place-items-center rounded-xl">
+                    <Cpu size={16} />
+                  </span>
+                  <div>
+                    <p className="font-mono text-sm font-semibold">{sm.id}</p>
+                    <p className="text-muted-foreground text-[11px]">{sm.type}</p>
+                  </div>
+                </div>
+                <Status status={sm.status} />
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                <Tile label="Tx (live)" value={String(machineTx.length)} />
+                <Tile label="Revenue" value={`AED ${machineTx.reduce((a, t) => a + t.revenueAED, 0).toFixed(0)}`} />
+                <Tile label="Yield" value={`+${machineYield.toFixed(3)}`} accent />
+              </div>
+              <div className="text-primary mt-3 flex items-center justify-center gap-1 rounded-xl border border-primary/30 py-2 text-xs font-medium">
+                {rec ? "Open machine" : "Coming soon"} <ChevronRight size={12} />
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
+        <TrendingUp size={11} /> Bucket activity
+      </p>
+      <LiveActivityFeed bare limit={6} />
+    </AppShell>
+  );
+}
+
+function Tile({
+  label, value, live, accent,
+}: { label: string; value?: string; live?: React.ReactNode; accent?: boolean }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+      <p className="text-muted-foreground text-[10px] uppercase tracking-wide">{label}</p>
+      <p className={`font-display mt-1 text-base font-semibold tabular-nums ${accent ? "text-gradient-brand" : ""}`}>
+        {live ?? value}
+      </p>
+    </div>
+  );
+}
+
+function Status({ status }: { status: "Active" | "Maintenance" | "Offline" }) {
+  const map = {
+    Active: "bg-success/15 text-success",
+    Maintenance: "bg-warning/15 text-warning",
+    Offline: "bg-destructive/15 text-destructive",
+  } as const;
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] ${map[status]}`}>
+      <Activity size={9} /> {status}
+    </span>
+  );
+}
+
+// Re-import (suppress unused-name lint via aliasing)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _kw = MapPin;
