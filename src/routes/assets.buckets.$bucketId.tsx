@@ -88,13 +88,8 @@ function BucketPage() {
           const rec = machineRecords.find((r) => r.id === sm.id);
           const machineTx = txInBucket.filter((t) => t.machineId === sm.id);
           const machineYield = machineTx.reduce((a, t) => a + t.yieldMDMT, 0);
-          return (
-            <Link
-              key={sm.id}
-              to={rec ? "/assets/machines/$machineId" : "/assets"}
-              {...(rec ? { params: { machineId: sm.id } } : {})}
-              className="bg-gradient-card block rounded-2xl border border-white/10 p-4"
-            >
+          const inner = (
+            <>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <span className="bg-gradient-brand-soft grid h-10 w-10 place-items-center rounded-xl">
@@ -115,10 +110,28 @@ function BucketPage() {
               <div className="text-primary mt-3 flex items-center justify-center gap-1 rounded-xl border border-primary/30 py-2 text-xs font-medium">
                 {rec ? "Open machine" : "Coming soon"} <ChevronRight size={12} />
               </div>
+            </>
+          );
+          return rec ? (
+            <Link
+              key={sm.id}
+              to="/assets/machines/$machineId"
+              params={{ machineId: sm.id }}
+              className="bg-gradient-card block rounded-2xl border border-white/10 p-4"
+            >
+              {inner}
             </Link>
+          ) : (
+            <div
+              key={sm.id}
+              className="bg-gradient-card block rounded-2xl border border-white/10 p-4 opacity-90"
+            >
+              {inner}
+            </div>
           );
         })}
       </div>
+
 
       <p className="text-muted-foreground mt-5 mb-2 flex items-center gap-1 text-[11px] uppercase tracking-wide">
         <TrendingUp size={11} /> Bucket activity
