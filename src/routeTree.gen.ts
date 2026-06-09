@@ -83,15 +83,15 @@ const ActivityIndexRoute = ActivityIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceProductIdRoute = MarketplaceProductIdRouteImport.update({
-  id: '/$productId',
-  path: '/$productId',
-  getParentRoute: () => MarketplaceRoute,
+  id: '/marketplace/$productId',
+  path: '/marketplace/$productId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceCheckoutProductIdRoute =
   MarketplaceCheckoutProductIdRouteImport.update({
-    id: '/checkout/$productId',
-    path: '/checkout/$productId',
-    getParentRoute: () => MarketplaceRoute,
+    id: '/marketplace/checkout/$productId',
+    path: '/marketplace/checkout/$productId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AssetsMachinesMachineIdRoute = AssetsMachinesMachineIdRouteImport.update({
   id: '/assets/machines/$machineId',
@@ -109,9 +109,9 @@ const AssetsBucketsBucketIdRoute = AssetsBucketsBucketIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ActivityEventEventIdRoute = ActivityEventEventIdRouteImport.update({
-  id: '/event/$eventId',
-  path: '/event/$eventId',
-  getParentRoute: () => ActivityRoute,
+  id: '/activity/event/$eventId',
+  path: '/activity/event/$eventId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -241,12 +241,15 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   StakingRoute: typeof StakingRoute
   TransparencyRoute: typeof TransparencyRoute
+  MarketplaceProductIdRoute: typeof MarketplaceProductIdRoute
   ActivityIndexRoute: typeof ActivityIndexRoute
   AssetsIndexRoute: typeof AssetsIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
+  ActivityEventEventIdRoute: typeof ActivityEventEventIdRoute
   AssetsBucketsBucketIdRoute: typeof AssetsBucketsBucketIdRoute
   AssetsIdsAssetIdRoute: typeof AssetsIdsAssetIdRoute
   AssetsMachinesMachineIdRoute: typeof AssetsMachinesMachineIdRoute
+  MarketplaceCheckoutProductIdRoute: typeof MarketplaceCheckoutProductIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -330,17 +333,17 @@ declare module '@tanstack/react-router' {
     }
     '/marketplace/$productId': {
       id: '/marketplace/$productId'
-      path: '/$productId'
+      path: '/marketplace/$productId'
       fullPath: '/marketplace/$productId'
       preLoaderRoute: typeof MarketplaceProductIdRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/marketplace/checkout/$productId': {
       id: '/marketplace/checkout/$productId'
-      path: '/checkout/$productId'
+      path: '/marketplace/checkout/$productId'
       fullPath: '/marketplace/checkout/$productId'
       preLoaderRoute: typeof MarketplaceCheckoutProductIdRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/assets/machines/$machineId': {
       id: '/assets/machines/$machineId'
@@ -365,10 +368,10 @@ declare module '@tanstack/react-router' {
     }
     '/activity/event/$eventId': {
       id: '/activity/event/$eventId'
-      path: '/event/$eventId'
+      path: '/activity/event/$eventId'
       fullPath: '/activity/event/$eventId'
       preLoaderRoute: typeof ActivityEventEventIdRouteImport
-      parentRoute: typeof ActivityRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -382,12 +385,15 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   StakingRoute: StakingRoute,
   TransparencyRoute: TransparencyRoute,
+  MarketplaceProductIdRoute: MarketplaceProductIdRoute,
   ActivityIndexRoute: ActivityIndexRoute,
   AssetsIndexRoute: AssetsIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
+  ActivityEventEventIdRoute: ActivityEventEventIdRoute,
   AssetsBucketsBucketIdRoute: AssetsBucketsBucketIdRoute,
   AssetsIdsAssetIdRoute: AssetsIdsAssetIdRoute,
   AssetsMachinesMachineIdRoute: AssetsMachinesMachineIdRoute,
+  MarketplaceCheckoutProductIdRoute: MarketplaceCheckoutProductIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
