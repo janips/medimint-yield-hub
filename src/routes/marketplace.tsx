@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { EmptyState } from "@/components/EmptyState";
 import { marketplace, marketCategories, paymentMethods, MDMT_TO_USD } from "@/lib/mockData";
-import { Search, Star } from "lucide-react";
+import { Search, Star, ShoppingBag } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace")({
   head: () => ({
