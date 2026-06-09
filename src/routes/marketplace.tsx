@@ -49,10 +49,10 @@ function MarketPage() {
         ))}
       </div>
 
-      <Link to="/marketplace/$productId" params={{ productId: "m1" }} className="bg-gradient-hero mt-4 block overflow-hidden rounded-3xl border border-white/10 p-5">
+      <Link to="/marketplace/$productId" params={{ productId: "m13" }} className="bg-gradient-hero mt-4 block overflow-hidden rounded-3xl border border-white/10 p-5">
         <p className="text-muted-foreground text-[10px] uppercase tracking-wide">Featured</p>
         <h3 className="font-display mt-1 text-xl font-semibold">Longevity Diagnostic Panel</h3>
-        <p className="text-muted-foreground mt-1 text-xs">Full-body biomarker map · partner clinics in 12 cities.</p>
+        <p className="text-muted-foreground mt-1 text-xs">180-biomarker full-body panel · partner clinics in 12 cities.</p>
         <div className="mt-4 flex items-center justify-between">
           <span className="font-display text-2xl font-semibold">240 MDMT</span>
           <span className="bg-gradient-brand shadow-glow rounded-full px-4 py-2 text-xs font-semibold text-white">Explore</span>

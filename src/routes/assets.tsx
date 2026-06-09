@@ -2,27 +2,29 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Sparkline } from "@/components/Sparkline";
-import { machines, assetIds, portfolio } from "@/lib/mockData";
-import { Cpu, Activity, MapPin, ChevronRight } from "lucide-react";
+import { AnimatedNumber } from "@/components/AnimatedNumber";
+import { machines, assetIds, portfolio, assetBuckets } from "@/lib/mockData";
+import { useSim } from "@/lib/simEngine";
+import { Cpu, Activity, MapPin, ChevronRight, Layers } from "lucide-react";
 
 export const Route = createFileRoute("/assets")({
   head: () => ({
     meta: [
       { title: "My Assets — Medimint" },
-      { name: "description", content: "Your MDMT tokens, linked machines, and asset IDs at a glance." },
+      { name: "description", content: "Asset Buckets, machines and tokens — your healthcare infrastructure portfolio." },
     ],
   }),
   component: AssetsPage,
 });
 
-type Tab = "tokens" | "machines" | "ids";
+type Tab = "buckets" | "machines" | "tokens" | "ids";
 
 function AssetsPage() {
-  const [tab, setTab] = useState<Tab>("tokens");
+  const [tab, setTab] = useState<Tab>("buckets");
   return (
-    <AppShell title="My Assets" subtitle="Tokens · Machines · Asset IDs">
+    <AppShell title="My Assets" subtitle="Buckets · Machines · Tokens" wide>
       <div className="bg-secondary/60 mt-4 inline-flex w-full rounded-full p-1 text-xs">
-        {(["tokens", "machines", "ids"] as Tab[]).map((t) => (
+        {(["buckets", "machines", "tokens", "ids"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -35,10 +37,86 @@ function AssetsPage() {
         ))}
       </div>
 
-      {tab === "tokens" && <TokensTab />}
+      {tab === "buckets" && <BucketsTab />}
       {tab === "machines" && <MachinesTab />}
+      {tab === "tokens" && <TokensTab />}
       {tab === "ids" && <AssetIdsTab />}
     </AppShell>
+  );
+}
+
+function BucketsTab() {
+  const s = useSim();
+  // Share live engine yield across buckets weighted by myTokens (deterministic split)
+  const totalTokens = assetBuckets.reduce((a, b) => a + b.myTokens, 0);
+  const sessionDelta = s.myYieldToday - (assetBuckets[0]?.lifetimeYield !== undefined ? 18.42 : 18.42);
+
+  return (
+    <div className="mt-5 space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
+      <div className="bg-gradient-hero shadow-glow rounded-3xl border border-white/10 p-5 lg:col-span-2">
+        <p className="text-muted-foreground text-[10px] uppercase tracking-wide">You own</p>
+        <p className="font-display mt-1 text-3xl font-semibold lg:text-4xl">{assetBuckets.length} Asset Buckets</p>
+        <p className="text-muted-foreground mt-1 text-xs">
+          {assetBuckets.reduce((a, b) => a + b.machineIds.length, 0)} machines · {totalTokens.toLocaleString()} MDMT allocated
+        </p>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <Stat label="Active Machines" value={String(s.activeMachines)} />
+          <Stat label="Maintenance" value={String(s.maintenanceMachines)} />
+          <Stat label="Tx Today (network)" value={s.todayTx.toLocaleString()} />
+        </div>
+      </div>
+
+      {assetBuckets.map((b) => {
+        const weight = b.myTokens / totalTokens;
+        const liveYieldToday = +(s.myYieldToday * weight).toFixed(3);
+        const liveLifetime = b.lifetimeYield + Math.max(sessionDelta * weight, 0);
+        return (
+          <Link
+            key={b.id}
+            to="/assets/buckets/$bucketId"
+            params={{ bucketId: b.id }}
+            className="bg-gradient-card block rounded-3xl border border-white/10 p-5"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="bg-gradient-brand-soft grid h-12 w-12 place-items-center rounded-xl">
+                  <Layers size={18} />
+                </span>
+                <div>
+                  <p className="font-display text-base font-semibold">{b.name}</p>
+                  <p className="text-muted-foreground flex items-center gap-1 text-[11px]">
+                    <MapPin size={10} /> {b.region}
+                  </p>
+                </div>
+              </div>
+              <span className="bg-success/15 text-success rounded-full px-2 py-0.5 text-[10px] font-medium">
+                {b.apyPct}% APY
+              </span>
+            </div>
+            <p className="text-muted-foreground mt-3 text-[11px] leading-relaxed">{b.thesis}</p>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              <Stat label="Machines" value={String(b.machineIds.length)} />
+              <Stat
+                label="Yield Today"
+                live={<AnimatedNumber value={liveYieldToday} decimals={4} prefix="+" />}
+                accent
+              />
+              <Stat
+                label="Lifetime Yield"
+                live={<AnimatedNumber value={liveLifetime} decimals={2} locale />}
+                accent
+              />
+            </div>
+            <div className="mt-3 flex items-center justify-between">
+              <Sparkline data={b.trend} width={120} height={32} />
+              <span className="text-primary inline-flex items-center gap-1 text-xs font-medium">
+                View bucket <ChevronRight size={12} />
+              </span>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
   );
 }
 
@@ -73,7 +151,7 @@ function TokensTab() {
 
 function MachinesTab() {
   return (
-    <div className="mt-5 space-y-3">
+    <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
       {machines.map((m) => (
         <Link
           key={m.id}
@@ -109,9 +187,6 @@ function MachinesTab() {
               <Sparkline data={m.trend} width={80} height={36} />
             </div>
           </div>
-          <div className="border-primary/30 text-primary mt-3 flex items-center justify-center gap-1 rounded-xl border py-2 text-xs font-medium">
-            View Details <ChevronRight size={12} />
-          </div>
         </Link>
       ))}
     </div>
@@ -120,7 +195,7 @@ function MachinesTab() {
 
 function AssetIdsTab() {
   return (
-    <div className="mt-5 space-y-3">
+    <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
       {assetIds.map((a) => (
         <Link
           key={a.id}
@@ -153,11 +228,15 @@ function AssetIdsTab() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({
+  label, value, live, accent,
+}: { label: string; value?: string; live?: React.ReactNode; accent?: boolean }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 p-3">
       <p className="text-muted-foreground text-[10px] uppercase tracking-wide">{label}</p>
-      <p className="font-display mt-1 text-base font-semibold">{value}</p>
+      <p className={`font-display mt-1 text-base font-semibold tabular-nums ${accent ? "text-gradient-brand" : ""}`}>
+        {live ?? value}
+      </p>
     </div>
   );
 }

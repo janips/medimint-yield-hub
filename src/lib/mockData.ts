@@ -254,59 +254,163 @@ export interface MarketItem {
 }
 
 export const marketplace: MarketItem[] = [
-  {
-    id: "m1", title: "Longevity Diagnostic Panel", category: "Diagnostics", price: 240, blurb: "Full-body biomarker mapping & report.", emoji: "🧬",
-    description: "A comprehensive 180-biomarker panel mapping hormonal, metabolic, cardiovascular, and inflammatory markers. Delivered with a personalized clinician report.",
-    benefits: ["180+ biomarker analysis", "Clinician-reviewed report", "Personalised action plan", "Annual follow-up included"],
-    delivery: "At-home phlebotomy · 5 business days", provider: "Quantum Diagnostics", rating: 4.8, reviewCount: 1284,
-  },
-  {
-    id: "m2", title: "Online Doctor Consult", category: "Doctor Consultation", price: 35, blurb: "30-min specialist video session.", emoji: "🩺",
-    description: "Connect with a board-certified specialist from a curated network of 600+ doctors across 24 specialties. Includes prescription and follow-up notes.",
-    benefits: ["30-min video session", "E-prescription included", "Follow-up notes via app", "Available in 18 languages"],
-    delivery: "Instant booking · Same day", provider: "Medimint Care Network", rating: 4.9, reviewCount: 8420,
-  },
-  {
-    id: "m3", title: "Sleep & Recovery Pack", category: "Wellness Programs", price: 88, blurb: "12-week guided recovery plan.", emoji: "🌙",
-    description: "A 12-week sleep coaching program built around wearable data, CBT-I protocols, and personalized recovery routines.",
-    benefits: ["Weekly 1:1 coaching", "Wearable sync & insights", "CBT-I evidence-based", "Lifetime program access"],
-    delivery: "Digital · Starts within 48h", provider: "Restful Labs", rating: 4.7, reviewCount: 612,
-  },
-  {
-    id: "m4", title: "Mitochondrial Boost Stack", category: "Supplements", price: 64, blurb: "30-day NAD+ & CoQ10 stack.", emoji: "⚡",
-    description: "Clinical-grade supplement stack including NAD+ precursors, CoQ10, PQQ, and magnesium glycinate. Third-party lab tested.",
+  // Consultations
+  { id: "m1", title: "Doctor Video Consultation", category: "Doctor Consultation", price: 35, blurb: "30-min board-certified specialist session.", emoji: "🩺",
+    description: "Same-day video consultation with a board-certified specialist from Medimint's network of 600+ doctors across 24 specialties. Includes e-prescription and follow-up notes.",
+    benefits: ["30-min video session", "E-prescription included", "Follow-up notes in app", "18 languages supported"],
+    delivery: "Instant booking · Same day", provider: "Medimint Care Network", rating: 4.9, reviewCount: 8420 },
+  { id: "m2", title: "AI Doctor Subscription", category: "AI Doctor", price: 19, blurb: "Always-on AI triage and symptom analysis.", emoji: "🤖",
+    description: "24/7 access to Medimint AI Doctor — symptom triage, medication checks, and personalised follow-up reminders trained on peer-reviewed clinical data.",
+    benefits: ["24/7 AI triage", "Drug interaction checks", "Daily wellness nudges", "Doctor escalation pathway"],
+    delivery: "Monthly subscription", provider: "Medimint AI Health", rating: 4.7, reviewCount: 3120 },
+
+  // Supplements
+  { id: "m3", title: "Mitochondrial Boost Stack", category: "Supplements", price: 64, blurb: "30-day NAD+ & CoQ10 longevity stack.", emoji: "⚡",
+    description: "Clinical-grade supplement stack including NMN precursors, ubiquinol CoQ10, PQQ, and magnesium glycinate. Third-party lab tested.",
     benefits: ["NMN 500mg daily", "Ubiquinol CoQ10", "Third-party tested", "Free reorder reminder"],
-    delivery: "Worldwide shipping · 3-5 days", provider: "Apex Longevity", rating: 4.6, reviewCount: 944,
-  },
-  {
-    id: "m5", title: "Executive MRI Screening", category: "Diagnostics", price: 480, blurb: "Premium MRI at partner clinics.", emoji: "🧠",
-    description: "Whole-body MRI screening at top-tier diagnostic centers. Includes radiologist review and concierge scheduling.",
-    benefits: ["Whole-body 3T MRI", "Radiologist double-read", "Concierge scheduling", "Secure digital report"],
-    delivery: "Partner clinic visit · By appointment", provider: "Medimint Partner Network", rating: 4.9, reviewCount: 287,
-  },
-  {
-    id: "m6", title: "Cardio Vitality Program", category: "Wellness Programs", price: 120, blurb: "Heart-rate guided 8-week plan.", emoji: "❤️",
-    description: "Heart-rate variability guided 8-week cardiovascular conditioning program with weekly coach calls.",
+    delivery: "Worldwide shipping · 3–5 days", provider: "Apex Longevity", rating: 4.6, reviewCount: 944 },
+  { id: "m4", title: "Daily Essentials Bundle", category: "Supplements", price: 42, blurb: "Multivitamin + Omega-3 + D3 monthly pack.", emoji: "💊",
+    description: "Medically formulated daily essentials — multivitamin, ultra-pure fish oil, and vitamin D3/K2. Auto-renew with free reformulation as your labs change.",
+    benefits: ["Pharmacist formulated", "Personalised dosing", "Free shipping", "Adapts to your bloodwork"],
+    delivery: "Monthly auto-ship", provider: "Medimint Pharmacy", rating: 4.7, reviewCount: 2204 },
+
+  // Subscriptions
+  { id: "m5", title: "MDMT Platform Subscription", category: "Subscriptions", price: 12, blurb: "Pro investor analytics + priority claims.", emoji: "💎",
+    description: "Unlock Pro investor analytics, priority yield claims, advanced exports, and white-glove portfolio support.",
+    benefits: ["Pro analytics dashboard", "Priority claim queue", "Custom CSV/PDF reports", "Dedicated investor success"],
+    delivery: "Monthly subscription", provider: "Medimint Platform", rating: 4.8, reviewCount: 612 },
+  { id: "m6", title: "Health Reward Subscription", category: "Subscriptions", price: 9, blurb: "Earn MDMT for daily wellness goals.", emoji: "🎁",
+    description: "Boost your daily Health Rewards earning rate by 2.5× and unlock weekly bonus challenges paid in MDMT.",
+    benefits: ["2.5× reward multiplier", "Weekly bonus challenges", "Family plan: 4 members", "Streak insurance"],
+    delivery: "Monthly subscription", provider: "Medimint Rewards", rating: 4.8, reviewCount: 1488 },
+  { id: "m7", title: "Digital Diagnostic Subscription", category: "Subscriptions", price: 29, blurb: "Quarterly at-home diagnostics + reports.", emoji: "🧪",
+    description: "Quarterly at-home phlebotomy kits, full panel processing in partner labs, and AI-narrated reports delivered to your wallet.",
+    benefits: ["At-home blood draw", "4 panels / year", "AI-narrated reports", "Trend dashboard"],
+    delivery: "Quarterly · Auto-scheduled", provider: "Quantum Diagnostics", rating: 4.7, reviewCount: 542 },
+  { id: "m8", title: "Digital Medical Records", category: "Subscriptions", price: 5, blurb: "Encrypted lifetime health vault.", emoji: "🗂️",
+    description: "Securely store all your medical records, prescriptions, and imaging in one encrypted vault. Selective sharing with verified providers via QR.",
+    benefits: ["Lifetime encrypted storage", "QR share with clinicians", "FHIR interoperability", "Family vault add-on"],
+    delivery: "Monthly subscription", provider: "Medimint Vault", rating: 4.9, reviewCount: 884 },
+  { id: "m9", title: "Medicine Reminder Pro", category: "Subscriptions", price: 4, blurb: "Smart adherence + family alerts.", emoji: "⏰",
+    description: "Intelligent medication reminders with adherence tracking, refill predictions, and family caregiver alerts.",
+    benefits: ["Smart dose reminders", "Refill prediction", "Family caregiver alerts", "Pharmacy auto-refill link"],
+    delivery: "Monthly subscription", provider: "Medimint Care", rating: 4.6, reviewCount: 1206 },
+
+  // Programs
+  { id: "m10", title: "Longevity Plan Premium", category: "Longevity Programs", price: 720, blurb: "12-month longevity protocol.", emoji: "🧘",
+    description: "12-month longevity protocol combining quarterly diagnostics, personalised supplementation, and bi-weekly coaching with longevity-trained physicians.",
+    benefits: ["Quarterly biomarkers", "Personalised supplement plan", "Bi-weekly coaching", "Member-only longevity events"],
+    delivery: "Full year access · Onboard in 7d", provider: "Apex Longevity", rating: 4.9, reviewCount: 198 },
+  { id: "m11", title: "Sleep & Recovery Program", category: "Wellness Programs", price: 88, blurb: "12-week guided recovery plan.", emoji: "🌙",
+    description: "12-week wearable-guided sleep coaching using CBT-I protocols and recovery science. Weekly 1:1 calls with certified sleep coaches.",
+    benefits: ["Weekly 1:1 coaching", "Wearable sync & insights", "CBT-I evidence-based", "Lifetime program access"],
+    delivery: "Digital · Starts within 48h", provider: "Restful Labs", rating: 4.7, reviewCount: 612 },
+  { id: "m12", title: "Cardio Vitality Program", category: "Wellness Programs", price: 120, blurb: "HRV-guided 8-week cardio plan.", emoji: "❤️",
+    description: "Heart-rate variability guided 8-week cardiovascular conditioning program with weekly coach calls and adaptive plans.",
     benefits: ["HRV-guided training", "Weekly coach call", "Custom workout plan", "Progress dashboard"],
-    delivery: "Digital · Starts within 24h", provider: "PulseFit Coaching", rating: 4.8, reviewCount: 521,
-  },
-  {
-    id: "m7", title: "Annual Health Package", category: "Health Packages", price: 380, blurb: "Full annual checkup bundle.", emoji: "🩹",
-    description: "All-in-one annual health package including diagnostics, doctor consults, dental check, and wellness coaching.",
+    delivery: "Digital · Starts within 24h", provider: "PulseFit Coaching", rating: 4.8, reviewCount: 521 },
+
+  // Diagnostics
+  { id: "m13", title: "Longevity Diagnostic Panel", category: "Diagnostics Packages", price: 240, blurb: "180-biomarker full-body panel.", emoji: "🧬",
+    description: "Comprehensive 180-biomarker panel mapping hormonal, metabolic, cardiovascular, and inflammatory markers. Delivered with a personalised clinician report.",
+    benefits: ["180+ biomarker analysis", "Clinician-reviewed report", "Personalised action plan", "Annual follow-up"],
+    delivery: "At-home phlebotomy · 5 business days", provider: "Quantum Diagnostics", rating: 4.8, reviewCount: 1284 },
+  { id: "m14", title: "Executive MRI Screening", category: "Diagnostics Packages", price: 480, blurb: "Whole-body 3T MRI at partner clinics.", emoji: "🧠",
+    description: "Whole-body MRI screening at top-tier diagnostic centres. Radiologist double-read review and concierge scheduling.",
+    benefits: ["Whole-body 3T MRI", "Radiologist double-read", "Concierge scheduling", "Secure digital report"],
+    delivery: "Partner clinic · By appointment", provider: "Medimint Partner Network", rating: 4.9, reviewCount: 287 },
+  { id: "m15", title: "Annual Health Package", category: "Diagnostics Packages", price: 380, blurb: "Full annual checkup bundle.", emoji: "🩹",
+    description: "All-in-one annual health package: diagnostics, four doctor consults, dental and vision check, and wellness coaching.",
     benefits: ["Annual full checkup", "4 doctor consultations", "Dental & vision", "Wellness coaching"],
-    delivery: "Multi-clinic · 30-day window", provider: "Medimint Care Network", rating: 4.9, reviewCount: 1480,
-  },
-  {
-    id: "m8", title: "Longevity Plan Premium", category: "Longevity Plans", price: 720, blurb: "12-month longevity protocol.", emoji: "🧘",
-    description: "12-month longevity protocol combining diagnostics, supplementation, and lifestyle coaching.",
-    benefits: ["Quarterly biomarkers", "Personalised supplement plan", "Bi-weekly coaching", "Member-only events"],
-    delivery: "Full year access · Onboarding within 7d", provider: "Apex Longevity", rating: 4.9, reviewCount: 198,
-  },
+    delivery: "Multi-clinic · 30-day window", provider: "Medimint Care Network", rating: 4.9, reviewCount: 1480 },
 ];
 
 export const marketCategories = [
-  "All", "Health Packages", "Doctor Consultation", "Supplements", "Wellness Programs", "Diagnostics", "Longevity Plans",
+  "All",
+  "Doctor Consultation",
+  "AI Doctor",
+  "Supplements",
+  "Subscriptions",
+  "Longevity Programs",
+  "Wellness Programs",
+  "Diagnostics Packages",
 ];
+
+export type PaymentMethodId = "mdmt" | "card" | "applepay" | "googlepay" | "upi";
+export interface PaymentMethod {
+  id: PaymentMethodId;
+  label: string;
+  blurb: string;
+  emoji: string;
+  /** AED-equivalent fee multiplier, applied on top of MDMT→AED conversion. */
+  feePct: number;
+}
+export const paymentMethods: PaymentMethod[] = [
+  { id: "mdmt", label: "Pay with MDMT", blurb: "Use your wallet balance — no FX, no card fees", emoji: "💎", feePct: 0 },
+  { id: "card", label: "Credit / Debit Card", blurb: "Visa, Mastercard, Amex", emoji: "💳", feePct: 0.029 },
+  { id: "applepay", label: "Apple Pay", blurb: "Face ID / Touch ID checkout", emoji: "", feePct: 0.025 },
+  { id: "googlepay", label: "Google Pay", blurb: "One-tap on supported devices", emoji: "🅖", feePct: 0.025 },
+  { id: "upi", label: "UPI", blurb: "GPay, PhonePe, Paytm, BHIM", emoji: "🇮🇳", feePct: 0.005 },
+];
+/** Mock MDMT → AED conversion for fiat checkout. */
+export const MDMT_TO_AED = 18.4;
+
+/* ---------------- ASSET BUCKETS ---------------- */
+
+export interface AssetBucket {
+  id: string;
+  name: string;
+  thesis: string;
+  region: string;
+  machineIds: string[];
+  /** investor's MDMT tokens held in this bucket */
+  myTokens: number;
+  /** lifetime MDMT yield earned from this bucket by the investor (seed baseline) */
+  lifetimeYield: number;
+  apyPct: number;
+  /** 14-day per-bucket performance for sparkline */
+  trend: number[];
+}
+
+export const assetBuckets: AssetBucket[] = [
+  {
+    id: "alpha",
+    name: "Asset Bucket Alpha",
+    thesis: "Dubai diagnostics cluster — premium MRI + CT throughput in high-demand corridors.",
+    region: "Dubai, UAE",
+    machineIds: ["MRI-DXB-003", "MRI-DXB-014", "CT-DXB-002"],
+    myTokens: 12_640,
+    lifetimeYield: 1_988.4,
+    apyPct: 14.2,
+    trend: [4.2, 4.4, 4.6, 4.5, 4.8, 5.1, 5.3, 5.2, 5.6, 5.8, 6.0, 6.3, 6.5, 6.8],
+  },
+  {
+    id: "beta",
+    name: "Asset Bucket Beta",
+    thesis: "Mumbai imaging + pathology — high-volume, mid-ticket diagnostic flow.",
+    region: "Mumbai, India",
+    machineIds: ["CT-MUM-011", "LAB-MUM-021"],
+    myTokens: 7_310,
+    lifetimeYield: 1_146.8,
+    apyPct: 12.8,
+    trend: [3.1, 3.3, 3.2, 3.5, 3.6, 3.8, 3.7, 4.0, 4.1, 4.3, 4.4, 4.6, 4.7, 4.9],
+  },
+  {
+    id: "gamma",
+    name: "Asset Bucket Gamma",
+    thesis: "Multi-region (Riyadh · Singapore · London) — diversified premium diagnostics.",
+    region: "RUH · SGP · LON",
+    machineIds: ["MRI-SGP-007", "CT-RUH-022", "LAB-RUH-031", "CT-LON-009"],
+    myTokens: 8_500,
+    lifetimeYield: 1_083.6,
+    apyPct: 13.4,
+    trend: [3.4, 3.6, 3.8, 3.7, 3.9, 4.0, 4.2, 4.3, 4.4, 4.5, 4.7, 4.8, 5.0, 5.1],
+  },
+];
+
+export function findBucket(id: string) {
+  return assetBuckets.find((b) => b.id === id);
+}
 
 export type RewardStatus = "Pending" | "Credited" | "Claimed";
 

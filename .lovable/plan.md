@@ -1,68 +1,163 @@
 
-# Medimint Super App — Full Build Plan
+# Medimint — "Live Platform" Upgrade Plan
 
-This is a substantial expansion (~20 new routes/screens + data model + components). I'll preserve the current premium dark/gradient look and keep the mobile-first 480px shell.
+A large, multi-area change. I will preserve the current visual identity, navigation, route structure, and dark gradient design language. No backend — everything simulated in the frontend.
 
-## Scope (in order)
+I'll ship this in phased commits inside one build pass so the app stays runnable between phases.
 
-### 1. Foundation
-- **Expand `mockData.ts`**: add richer machine detail (weekly tx, monthly yield series, daily tx breakdown), asset detail (event log w/ settlement status), per-event metadata (eventId, assetId, settlementStatus, txAmount), staking history with hashes, marketplace categories (Health Packages, Doctor Consult, Supplements, Wellness, Diagnostics, Longevity), product detail data, profile/KYC, notification preferences.
-- **Shared components**: `HashChip` (copy-to-clipboard hash w/ explorer link), `EmptyState`, `BottomSheet` (modal), `StatTile`, `MiniBarChart` (daily transactions), `LineChart` reuse, `ProgressRing` reuse.
-- **Bottom nav**: add **Staking** as 5th tab; move Rewards into a 6-tab layout (Home / Assets / Activity / Staking / Market / Rewards). Compact icons + labels to fit 6.
+---
 
-### 2. Home enhancements
-Keep current layout, add: Monthly Appreciation %, Active Assets count, Top Yield Asset row, expanded Quick Actions (Stake, Claim, Marketplace, Assets), each yield feed item gets "View Details" → opens event bottom sheet with full metadata + hash.
+## Phase 1 — Branding
 
-### 3. Assets module
-- Sub-tabs preserved (Tokens / Machines / Asset IDs) — enrich with Pending Rewards, Next Reward Date, Estimated Appreciation, Token Perf Indicator.
-- **New route** `/assets/machines/$machineId` — overview, status, tx today/week, yield today/month, daily tx bar chart, monthly yield line chart, yield events timeline w/ hashes, blockchain verification panel, Export Report + View Linked Asset.
-- **New route** `/assets/ids/$assetId` — overview, machine mapping, token allocation, yield history line, event timeline, hash log.
+- Add official Medimint logo assets (light + dark) and replace `BrandLogo` usage across AppShell, BottomNav header, login/onboarding, splash, and desktop nav.
+- Generate: light logo, dark logo, app icon, favicon, splash screen (premium imagegen).
+- Replace `public/icons/*` and `public/manifest.webmanifest` icon refs.
+- Update `__root.tsx` head: favicon, theme-color, apple-touch-icon, splash.
 
-### 4. Activity module
-3 tabs: Yield Events (filters: date/machine/highest yield), Daily Transactions (expandable day cards with machine breakdown), Notifications (search + mark-all-read + category filters). Event tap → `/activity/event/$eventId` detail (or bottom sheet) with full metadata.
+> Question: I don't have the real Medimint logo file. I'll generate a clean wordmark+symbol in the existing brand palette (cyan/teal→violet gradient already used as `bg-gradient-brand`). If you have an official SVG/PNG, drop it in and I'll swap.
 
-### 5. Staking (new tab/route `/staking`)
-Dashboard (Total Staked, Available, APY, Reward Rate, Monthly Projection, Lifetime Rewards, Next Reward), actions (Stake/Unstake/Claim — bottom-sheet forms), Auto-Compound toggle, Reward Calculator (slider), history table w/ hashes, earnings + projection chart.
+---
 
-### 6. Notifications (`/notifications`)
-Full center: search, category filters, read/unread, mark all, preferences subpage. Header bell links here (currently links to /activity).
+## Phase 2 — Simulation Engine (the heart)
 
-### 7. Marketplace
-Reorder/add categories (Health Packages, Doctor Consultation, Supplements, Wellness Programs, Diagnostics, Longevity Plans). **New route** `/marketplace/$productId` — images, description, benefits, delivery, provider, reviews, price. CTA Pay with MDMT → 3-step checkout flow (`/marketplace/checkout/$productId`): summary → confirm → success with order #, ref ID, tx hash, download receipt.
+Extend `src/lib/liveYield.ts` → rename concept to **`simEngine`** (keep old hook as a thin re-export so existing screens keep working). Single source of truth for:
 
-### 8. Rewards
-Keep current ring; add Monthly Rewards stat, Claim Rewards workflow (bottom sheet), explicit Status states (Pending/Credited/Claimed), Reward Conversion Formula card already exists — enrich.
+- Machines (Active / Maintenance counts, last-seen timestamp)
+- Live transaction stream (every 10–20s, jittered)
+- Today's counters: transactions, revenue (AED), yield (MDMT)
+- Lifetime counters
+- Rolling 7D / 30D / 90D series for transactions, revenue, yield
+- Activity feed (last ~50 events)
+- Notification stream
 
-### 9. Onboarding (`/onboarding`)
-6 swipeable screens: Welcome → Connect Wallet → Link Assets → How Yield Works → Marketplace Benefits → Rewards. "Skip" + final "Go to Dashboard". Show once via localStorage flag (intercept on first visit to `/`).
+Each tick:
+1. Pick a random Active machine, generate a transaction:
+   - `type` (Patient Scan, Completed Scan, Diagnostic Report, Lab Result, Consultation)
+   - `revenueAED` (machine-type-aware band, e.g. MRI 200–350, CT 150–280, Lab 30–80)
+   - `yieldMDMT = revenueAED * machine.yieldRate` (keeps yield ↔ revenue logical)
+   - `hash` (12-hex), `fullHash` (40-hex), `assetId`, `bucketId`, timestamp
+2. Push into activity feed, increment today counters, append to series tail.
+3. Occasionally (1 in 4) emit a notification of the appropriate type.
+4. Rare events: machine flips Active↔Maintenance (~1% per tick) so "Machines Under Maintenance" actually moves.
 
-### 10. Profile & Settings (`/profile`, `/settings`)
-Profile: Personal Info, Wallet Info, Linked Assets summary, KYC Status badge. Settings sub-sections: Notifications, Security (Biometrics/Passcode/2FA toggles), Rewards Preferences. Header avatar opens Profile.
+Exposed via `useSimEngine()` with `useSyncExternalStore`. All existing screens continue using `useLiveYield()` which now reads from the engine.
 
-### 11. Transparency Hub (`/transparency`)
-Linked from Home + Profile + footer. Sections: Blockchain Verification, Yield Audit Trail (recent events), Asset Ownership Records, Machine Performance Verification, Hash Explorer (search by hash), Download/Export Report buttons (mock CSV).
+---
 
-### 12. Empty states + micro-interactions
-EmptyState component used across all lists. Add subtle animation: live counter ticking on Home (yield today increments every few seconds), notification badge count, framer-motion fade-in on new feed items.
+## Phase 3 — Asset Buckets (data model redesign)
+
+In `mockData.ts`:
+
+- Introduce `assetBuckets: [{ id: 'alpha', name: 'Asset Bucket Alpha', machineIds: [...], tokens, ... }]` — Alpha / Beta / Gamma.
+- Each machine carries `bucketId` and `yieldRate` (MDMT per AED).
+- Replace "4 Machines · 7 Assets · 7 Active" tiles on Assets screen with a Bucket list:
+  - Card per bucket: machine count, Yield Today (live), Lifetime Yield (live), mini sparkline, drill-in.
+- New route `assets.buckets.$bucketId.tsx`: bucket overview → machine list (reuses existing machine detail page).
+- Keep existing Tokens / Machines / Asset IDs sub-tabs but reframe headline metrics as bucket-first.
+
+---
+
+## Phase 4 — Live Operations Center (Home)
+
+New section above existing Home content:
+
+- **LIVE NETWORK STATUS** card with pulsing green dot + "LIVE" pill.
+  - Machines Active / Under Maintenance
+  - Transactions Today / Revenue Today (AED) / Yield Distributed Today (MDMT)
+  - "Last transaction received: MRI-DXB-003 · 3s ago" (auto-ticks)
+- Existing Yield Today / Lifetime tiles stay (already animated).
+- Real-time activity feed component (`<LiveActivityFeed/>`) — animated insert at top, capped list, hash chip + settlement pill.
+
+---
+
+## Phase 5 — Dynamic Charts (7D / 30D / 90D)
+
+- New `<RangeChart>` wrapper around existing `AreaChart` / `BarChart` with tab pill (7D / 30D / 90D).
+- Datasets generated per range from `simEngine` history + seeded back-fill (different shapes per range — weekly cycles for 7D, weekday utilization curves for 30D, seasonal drift for 90D).
+- Animate transition between ranges (framer-motion).
+- Used on Home (Yield + Transactions) and Bucket / Machine detail.
+
+---
+
+## Phase 6 — Yield Logic Correction
+
+Centralize formula: every displayed (Transactions, Revenue, Yield) triplet derives from the same tick stream.
+
+- Home Today tile: shows all three with logical ratio (e.g. avg ~AED 150/tx, ~2% MDMT yield rate → 906 tx · AED 136,000 · 2,720 MDMT).
+- Machine detail: derived from machine-specific rate.
+- Bucket detail: sum of contained machines.
+- Remove any hard-coded yield values that don't trace back to revenue.
+
+---
+
+## Phase 7 — Notifications
+
+- Engine already pushes "Your asset generated yield" entries.
+- Add categories: yield, transaction, maintenance, payout, marketplace.
+- Notification center: keep existing filters; add toast for newly arriving notifications when app is foregrounded (uses existing `sonner`).
+
+---
+
+## Phase 8 — Desktop / Responsive Layout
+
+- `AppShell` currently 480px mobile shell. Add `lg:` breakpoint:
+  - `lg`: switch to two-pane: left sidebar nav (Dashboard / Assets / Activity / Marketplace / Rewards / Reports / Transparency Hub / Settings), main content max-w-7xl, multi-column grids for stats.
+  - Bottom nav hidden on `lg`.
+- Tablet (`md`): widen shell to 768, two-col grids.
+- Home/Assets/Marketplace get desktop grid variants (CSS only — same components).
+- Add `/reports` route (was missing) that surfaces investor statements / CSV exports.
+
+---
+
+## Phase 9 — Marketplace Expansion
+
+Replace placeholder products in `mockData.ts` with full catalog:
+
+- Doctor Consultation, Supplements, MDMT Platform Subscription, Health Reward Subscription, Digital Diagnostic Subscription, AI Doctor Subscription, Digital Medical Records, Medicine Reminder, Longevity Programs, Diagnostics Packages, Wellness Programs.
+- Each item: image (gradient + icon, generated), description, benefits[], provider, price (MDMT + AED), reviews[].
+- Product detail page already exists — enrich.
+
+### Checkout
+Extend `marketplace.checkout.$productId.tsx`:
+- Step 1: Payment method picker (Pay with MDMT | Credit Card | Debit Card | Apple Pay | Google Pay | UPI).
+- Step 2: Method-specific form (mock fields).
+- Step 3: Success with order #, ref ID, tx hash.
+
+---
+
+## Phase 10 — Transparency Hub
+
+Expand `/transparency` into a full hub with sections:
+
+- Asset Ownership Records (per bucket → per asset id)
+- Machine Registry (all machines + status, manufacturer, serial, commissioned)
+- Yield Distribution History (live feed snapshot, paginated)
+- Blockchain Hash Explorer (search box prefilled via `?q=` — already partly supported)
+- Yield Audit Trail (event → asset → bucket → owner chain)
+- Revenue Distribution History
+- Investor Statements (downloadable mock PDF/CSV)
+- Export Transaction History (CSV download generated client-side from sim engine)
+
+---
 
 ## Technical Details
 
-- All data stays in `mockData.ts` (no backend) — no Cloud activation needed.
-- Routing: TanStack file routes with `$param` for detail pages, dot-separated filenames (e.g. `assets.machines.$machineId.tsx`).
-- Each route gets `head()` meta + `errorComponent` + `notFoundComponent`.
-- Bottom sheets via shadcn `Drawer`.
-- Charts: reuse `AreaChart` + new lightweight `BarChart` SVG.
-- Hash chip: `navigator.clipboard.writeText` + toast.
-- Live counter: `useEffect` interval + framer-motion `animate`.
-- 6-tab nav: tighten padding, 10px labels, allow horizontal scroll fallback.
+- All sim state in `src/lib/simEngine.ts`, single tick loop, `useSyncExternalStore`.
+- Charts: reuse existing `AreaChart`/`BarChart`, add `RangeChart` shell.
+- New components: `LiveStatusCard`, `LiveActivityFeed`, `BucketCard`, `RangeChart`, `MetricTriplet`, `DesktopSidebar`, `PaymentMethodPicker`, `CsvDownloadButton`.
+- New routes: `assets.buckets.$bucketId.tsx`, `reports.tsx`.
+- No new dependencies needed.
+- No backend / Cloud activation.
+- Mock data only; logos generated via `imagegen` (premium for text-bearing logo).
 
-## What I'm NOT doing (unless you say so)
-- Real wallet connect / real blockchain — all simulated.
-- Backend, auth, DB (no Lovable Cloud).
-- Light mode polish — keeping dark theme as primary (tokens already support both).
-- Real push notifications.
+---
 
-## Approx output
-~20 new route files, 6–8 new components, expanded mockData, updated AppShell + BottomNav. Should keep visual language identical (gradient cards, brand palette, framer-motion).
+## Out of Scope (call out if you want them)
+- Real auth / real wallet connect.
+- Real payments (Stripe/Paddle) — checkout stays simulated.
+- Real PDF generation for statements — CSV + printable HTML view instead.
+- Capacitor / native Android wrap (separate path, already discussed).
 
-Ready to build — confirm and I'll ship it in one pass.
+---
+
+This is a big pass — ~10–14 new/edited files plus assets. Confirm and I'll execute end-to-end.

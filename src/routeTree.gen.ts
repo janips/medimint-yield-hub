@@ -24,6 +24,7 @@ import { Route as MarketplaceProductIdRouteImport } from './routes/marketplace.$
 import { Route as MarketplaceCheckoutProductIdRouteImport } from './routes/marketplace.checkout.$productId'
 import { Route as AssetsMachinesMachineIdRouteImport } from './routes/assets.machines.$machineId'
 import { Route as AssetsIdsAssetIdRouteImport } from './routes/assets.ids.$assetId'
+import { Route as AssetsBucketsBucketIdRouteImport } from './routes/assets.buckets.$bucketId'
 import { Route as ActivityEventEventIdRouteImport } from './routes/activity.event.$eventId'
 
 const TransparencyRoute = TransparencyRouteImport.update({
@@ -102,6 +103,11 @@ const AssetsIdsAssetIdRoute = AssetsIdsAssetIdRouteImport.update({
   path: '/ids/$assetId',
   getParentRoute: () => AssetsRoute,
 } as any)
+const AssetsBucketsBucketIdRoute = AssetsBucketsBucketIdRouteImport.update({
+  id: '/buckets/$bucketId',
+  path: '/buckets/$bucketId',
+  getParentRoute: () => AssetsRoute,
+} as any)
 const ActivityEventEventIdRoute = ActivityEventEventIdRouteImport.update({
   id: '/event/$eventId',
   path: '/event/$eventId',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/transparency': typeof TransparencyRoute
   '/marketplace/$productId': typeof MarketplaceProductIdRoute
   '/activity/event/$eventId': typeof ActivityEventEventIdRoute
+  '/assets/buckets/$bucketId': typeof AssetsBucketsBucketIdRoute
   '/assets/ids/$assetId': typeof AssetsIdsAssetIdRoute
   '/assets/machines/$machineId': typeof AssetsMachinesMachineIdRoute
   '/marketplace/checkout/$productId': typeof MarketplaceCheckoutProductIdRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/transparency': typeof TransparencyRoute
   '/marketplace/$productId': typeof MarketplaceProductIdRoute
   '/activity/event/$eventId': typeof ActivityEventEventIdRoute
+  '/assets/buckets/$bucketId': typeof AssetsBucketsBucketIdRoute
   '/assets/ids/$assetId': typeof AssetsIdsAssetIdRoute
   '/assets/machines/$machineId': typeof AssetsMachinesMachineIdRoute
   '/marketplace/checkout/$productId': typeof MarketplaceCheckoutProductIdRoute
@@ -159,6 +167,7 @@ export interface FileRoutesById {
   '/transparency': typeof TransparencyRoute
   '/marketplace/$productId': typeof MarketplaceProductIdRoute
   '/activity/event/$eventId': typeof ActivityEventEventIdRoute
+  '/assets/buckets/$bucketId': typeof AssetsBucketsBucketIdRoute
   '/assets/ids/$assetId': typeof AssetsIdsAssetIdRoute
   '/assets/machines/$machineId': typeof AssetsMachinesMachineIdRoute
   '/marketplace/checkout/$productId': typeof MarketplaceCheckoutProductIdRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/transparency'
     | '/marketplace/$productId'
     | '/activity/event/$eventId'
+    | '/assets/buckets/$bucketId'
     | '/assets/ids/$assetId'
     | '/assets/machines/$machineId'
     | '/marketplace/checkout/$productId'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/transparency'
     | '/marketplace/$productId'
     | '/activity/event/$eventId'
+    | '/assets/buckets/$bucketId'
     | '/assets/ids/$assetId'
     | '/assets/machines/$machineId'
     | '/marketplace/checkout/$productId'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/transparency'
     | '/marketplace/$productId'
     | '/activity/event/$eventId'
+    | '/assets/buckets/$bucketId'
     | '/assets/ids/$assetId'
     | '/assets/machines/$machineId'
     | '/marketplace/checkout/$productId'
@@ -341,6 +353,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssetsIdsAssetIdRouteImport
       parentRoute: typeof AssetsRoute
     }
+    '/assets/buckets/$bucketId': {
+      id: '/assets/buckets/$bucketId'
+      path: '/buckets/$bucketId'
+      fullPath: '/assets/buckets/$bucketId'
+      preLoaderRoute: typeof AssetsBucketsBucketIdRouteImport
+      parentRoute: typeof AssetsRoute
+    }
     '/activity/event/$eventId': {
       id: '/activity/event/$eventId'
       path: '/event/$eventId'
@@ -364,11 +383,13 @@ const ActivityRouteWithChildren = ActivityRoute._addFileChildren(
 )
 
 interface AssetsRouteChildren {
+  AssetsBucketsBucketIdRoute: typeof AssetsBucketsBucketIdRoute
   AssetsIdsAssetIdRoute: typeof AssetsIdsAssetIdRoute
   AssetsMachinesMachineIdRoute: typeof AssetsMachinesMachineIdRoute
 }
 
 const AssetsRouteChildren: AssetsRouteChildren = {
+  AssetsBucketsBucketIdRoute: AssetsBucketsBucketIdRoute,
   AssetsIdsAssetIdRoute: AssetsIdsAssetIdRoute,
   AssetsMachinesMachineIdRoute: AssetsMachinesMachineIdRoute,
 }
