@@ -329,11 +329,35 @@ function MachineDetailPage() {
         ))}
       </div>
 
-      <button className="bg-gradient-brand shadow-glow mt-6 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-white">
+      <button className="bg-gradient-card hover:bg-gradient-brand-soft mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-white/10 py-3 text-sm font-semibold transition-all">
         <Download size={14} /> Export Report
       </button>
-      <div className="h-4" />
-    </AppShell>
+
+      {/* Sticky staking action panel */}
+      <div className="h-28" />
+      <div className="fixed inset-x-0 bottom-16 z-30 px-4 lg:bottom-4">
+        <div className="mx-auto max-w-3xl">
+          <div className="bg-gradient-hero shadow-glow rounded-2xl border border-primary/30 p-3 backdrop-blur-xl">
+            <div className="flex items-center justify-between gap-2">
+              <div className="hidden min-w-0 sm:block">
+                <p className="text-muted-foreground text-[10px] uppercase tracking-wide">My stake</p>
+                <p className="font-display text-sm font-semibold tabular-nums">{myStake.toLocaleString()} MDMT · +{myPendingRewards.toFixed(2)} pending</p>
+              </div>
+              <div className="flex flex-1 items-center gap-2 sm:flex-initial">
+                <Link to="/staking" className="bg-gradient-brand shadow-glow inline-flex flex-1 items-center justify-center gap-1 rounded-full px-3 py-2 text-xs font-semibold text-white sm:flex-initial">
+                  <Coins size={13} /> {myStake > 0 ? "Increase Stake" : "Stake MDMT"}
+                </Link>
+                <Link to="/rewards" className="bg-secondary/80 inline-flex flex-1 items-center justify-center gap-1 rounded-full px-3 py-2 text-xs font-semibold sm:flex-initial">
+                  <Gift size={13} /> Claim
+                </Link>
+                <Link to="/activity" className="border-white/10 inline-flex items-center justify-center gap-1 rounded-full border px-3 py-2 text-xs font-medium">
+                  <History size={13} />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
   );
 }
 
