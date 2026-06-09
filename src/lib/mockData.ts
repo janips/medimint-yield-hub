@@ -33,13 +33,16 @@ export type MachineStatus = "Active" | "Maintenance" | "Offline";
 
 export interface Machine {
   id: string;
+  name?: string;
   type: string;
   location: string;
   status: MachineStatus;
   txToday: number;
   yieldToday: number;
   txWeek: number;
+  txMonth?: number;
   yieldMonth: number;
+  revenueGeneratedAED?: number;
   trend: number[];
   dailyTx: number[];
   dailyYield: number[];
@@ -47,111 +50,209 @@ export interface Machine {
   assetIds: string[];
   totalSupply: number;
   ownedSince: string;
+  launchDate?: string;
   manufacturer: string;
+  model?: string;
   serial: string;
   commissioned: string;
   uptimePct: number;
+  utilizationPct?: number;
   lifetimeTx: number;
   lifetimeYield: number;
   avgYieldPerTx: number;
+  currentAPY?: number;
+  totalStaked?: number;
+  numInvestors?: number;
+  badge?: "Top Performing" | "New" | null;
+  bucketId?: string;
+  // investor-specific
+  myStake?: number;
+  myStakeDate?: string;
+  myPendingRewards?: number;
+  myRewardsEarned?: number;
+  peakHours?: string;
+  avgDailyScans?: number;
+  scansToday?: number;
+  scansWeek?: number;
+  scansMonth?: number;
 }
 
 export const machines: Machine[] = [
   {
     id: "MRI-DXB-003",
+    name: "Mediclinic MRI Suite 3",
     type: "MRI 3T",
     location: "Mediclinic, Dubai",
     status: "Active",
-    txToday: 48,
-    yieldToday: 7.24,
-    txWeek: 312,
-    yieldMonth: 196.4,
+    txToday: 148, yieldToday: 7.24,
+    txWeek: 982, txMonth: 4285, yieldMonth: 196.4,
+    revenueGeneratedAED: 642_500,
     trend: [22, 28, 34, 30, 38, 44, 48],
     dailyTx: [38, 44, 36, 48, 52, 41, 48],
     dailyYield: [5.42, 6.18, 5.04, 6.84, 7.42, 5.86, 7.24],
     monthlyYield: [142, 156, 168, 174, 182, 196],
     assetIds: ["ASSET-000392", "ASSET-000418"],
-    totalSupply: 100000,
-    ownedSince: "Aug 14, 2024",
-    manufacturer: "Siemens Healthineers",
-    serial: "SH-MRI3T-DXB-003",
-    commissioned: "Mar 02, 2023",
-    uptimePct: 98.4,
-    lifetimeTx: 14820,
-    lifetimeYield: 2184.6,
-    avgYieldPerTx: 0.147,
+    totalSupply: 100000, ownedSince: "Aug 14, 2024", launchDate: "Jan 2024",
+    manufacturer: "Siemens Healthineers", model: "MAGNETOM Vida 3T",
+    serial: "SH-MRI3T-DXB-003", commissioned: "Mar 02, 2023",
+    uptimePct: 98.4, utilizationPct: 92,
+    lifetimeTx: 14820, lifetimeYield: 2184.6, avgYieldPerTx: 0.147,
+    currentAPY: 14.2, totalStaked: 78400, numInvestors: 312, badge: "Top Performing",
+    bucketId: "dubai",
+    myStake: 12500, myStakeDate: "12 Jan 2026",
+    myPendingRewards: 23.4, myRewardsEarned: 845.2,
+    peakHours: "09:00–13:00", avgDailyScans: 142,
+    scansToday: 148, scansWeek: 982, scansMonth: 4285,
   },
   {
     id: "CT-MUM-011",
+    name: "Apollo CT Suite 11",
     type: "CT 128-Slice",
     location: "Apollo, Mumbai",
     status: "Active",
-    txToday: 36,
-    yieldToday: 4.82,
-    txWeek: 248,
-    yieldMonth: 144.2,
+    txToday: 112, yieldToday: 4.82,
+    txWeek: 712, txMonth: 3120, yieldMonth: 144.2,
+    revenueGeneratedAED: 384_200,
     trend: [18, 22, 26, 24, 30, 32, 36],
     dailyTx: [28, 32, 26, 34, 36, 30, 36],
     dailyYield: [3.68, 4.21, 3.42, 4.48, 4.74, 3.94, 4.82],
     monthlyYield: [112, 118, 124, 132, 138, 144],
     assetIds: ["ASSET-000507", "ASSET-000612"],
-    totalSupply: 80000,
-    ownedSince: "Sep 22, 2024",
-    manufacturer: "GE Healthcare",
-    serial: "GE-CT128-MUM-011",
-    commissioned: "Jun 18, 2022",
-    uptimePct: 97.1,
-    lifetimeTx: 12440,
-    lifetimeYield: 1648.2,
-    avgYieldPerTx: 0.132,
+    totalSupply: 80000, ownedSince: "Sep 22, 2024", launchDate: "Apr 2023",
+    manufacturer: "GE Healthcare", model: "Revolution CT 128",
+    serial: "GE-CT128-MUM-011", commissioned: "Jun 18, 2022",
+    uptimePct: 97.1, utilizationPct: 88,
+    lifetimeTx: 12440, lifetimeYield: 1648.2, avgYieldPerTx: 0.132,
+    currentAPY: 12.8, totalStaked: 54200, numInvestors: 218, badge: null,
+    bucketId: "mumbai",
+    myStake: 8300, myStakeDate: "05 Feb 2026",
+    myPendingRewards: 14.6, myRewardsEarned: 512.8,
+    peakHours: "10:00–14:00", avgDailyScans: 104,
+    scansToday: 112, scansWeek: 712, scansMonth: 3120,
   },
   {
     id: "MRI-SGP-007",
+    name: "Mount Elizabeth MRI Bay 7",
     type: "MRI 1.5T",
-    location: "Mount Elizabeth, SG",
+    location: "Mount Elizabeth, Singapore",
     status: "Maintenance",
-    txToday: 12,
-    yieldToday: 1.92,
-    txWeek: 184,
-    yieldMonth: 118.6,
+    txToday: 38, yieldToday: 1.92,
+    txWeek: 412, txMonth: 1860, yieldMonth: 118.6,
+    revenueGeneratedAED: 248_900,
     trend: [20, 24, 22, 26, 22, 18, 12],
     dailyTx: [24, 22, 26, 22, 18, 16, 12],
     dailyYield: [3.84, 3.52, 4.16, 3.52, 2.88, 2.56, 1.92],
     monthlyYield: [98, 104, 112, 118, 122, 118],
     assetIds: ["ASSET-000724"],
-    totalSupply: 60000,
-    ownedSince: "Oct 05, 2024",
-    manufacturer: "Philips Healthcare",
-    serial: "PH-MRI15T-SGP-007",
-    commissioned: "Nov 11, 2021",
-    uptimePct: 92.6,
-    lifetimeTx: 10260,
-    lifetimeYield: 1356.4,
-    avgYieldPerTx: 0.128,
+    totalSupply: 60000, ownedSince: "Oct 05, 2024", launchDate: "Dec 2021",
+    manufacturer: "Philips Healthcare", model: "Ingenia 1.5T",
+    serial: "PH-MRI15T-SGP-007", commissioned: "Nov 11, 2021",
+    uptimePct: 92.6, utilizationPct: 71,
+    lifetimeTx: 10260, lifetimeYield: 1356.4, avgYieldPerTx: 0.128,
+    currentAPY: 11.6, totalStaked: 38600, numInvestors: 154, badge: null,
+    bucketId: "london",
+    myStake: 4200, myStakeDate: "18 Oct 2025",
+    myPendingRewards: 6.8, myRewardsEarned: 248.4,
+    peakHours: "11:00–15:00", avgDailyScans: 62,
+    scansToday: 38, scansWeek: 412, scansMonth: 1860,
   },
   {
     id: "CT-RUH-022",
+    name: "King Faisal CT Suite 22",
     type: "CT 256-Slice",
     location: "King Faisal, Riyadh",
     status: "Active",
-    txToday: 32,
-    yieldToday: 4.44,
-    txWeek: 224,
-    yieldMonth: 128.9,
+    txToday: 124, yieldToday: 4.44,
+    txWeek: 768, txMonth: 3340, yieldMonth: 128.9,
+    revenueGeneratedAED: 412_400,
     trend: [16, 20, 24, 26, 28, 30, 32],
     dailyTx: [22, 26, 24, 28, 30, 28, 32],
     dailyYield: [3.05, 3.61, 3.33, 3.88, 4.16, 3.88, 4.44],
     monthlyYield: [102, 108, 116, 120, 124, 128],
     assetIds: ["ASSET-000819", "ASSET-000901"],
-    totalSupply: 70000,
-    ownedSince: "Nov 19, 2024",
-    manufacturer: "Canon Medical",
-    serial: "CN-CT256-RUH-022",
-    commissioned: "Feb 28, 2023",
-    uptimePct: 99.1,
-    lifetimeTx: 11680,
-    lifetimeYield: 1524.8,
-    avgYieldPerTx: 0.131,
+    totalSupply: 70000, ownedSince: "Nov 19, 2024", launchDate: "Mar 2023",
+    manufacturer: "Canon Medical", model: "Aquilion ONE 256",
+    serial: "CN-CT256-RUH-022", commissioned: "Feb 28, 2023",
+    uptimePct: 99.1, utilizationPct: 94,
+    lifetimeTx: 11680, lifetimeYield: 1524.8, avgYieldPerTx: 0.131,
+    currentAPY: 13.1, totalStaked: 48900, numInvestors: 186, badge: null,
+    bucketId: "abudhabi",
+    myStake: 6800, myStakeDate: "22 Nov 2025",
+    myPendingRewards: 11.2, myRewardsEarned: 396.8,
+    peakHours: "08:00–12:00", avgDailyScans: 118,
+    scansToday: 124, scansWeek: 768, scansMonth: 3340,
+  },
+  {
+    id: "ULTRA-AUH-041",
+    name: "Cleveland Clinic Ultrasound 4",
+    type: "Ultrasound",
+    location: "Cleveland Clinic, Abu Dhabi",
+    status: "Active",
+    txToday: 86, yieldToday: 2.18,
+    txWeek: 612, txMonth: 2640, yieldMonth: 84.2,
+    revenueGeneratedAED: 198_400,
+    trend: [12, 14, 18, 20, 22, 24, 26],
+    dailyTx: [62, 68, 74, 70, 78, 82, 86],
+    dailyYield: [1.62, 1.78, 1.92, 1.84, 2.04, 2.12, 2.18],
+    monthlyYield: [62, 68, 74, 78, 80, 84],
+    assetIds: [],
+    totalSupply: 50000, ownedSince: "Feb 14, 2025", launchDate: "Sep 2024",
+    manufacturer: "GE Healthcare", model: "LOGIQ E10",
+    serial: "GE-USE10-AUH-041", commissioned: "Aug 14, 2024",
+    uptimePct: 99.4, utilizationPct: 89,
+    lifetimeTx: 8420, lifetimeYield: 612.4, avgYieldPerTx: 0.073,
+    currentAPY: 11.4, totalStaked: 28400, numInvestors: 96, badge: "New",
+    bucketId: "abudhabi",
+    peakHours: "09:00–13:00", avgDailyScans: 78,
+    scansToday: 86, scansWeek: 612, scansMonth: 2640,
+  },
+  {
+    id: "MAMMO-AMD-018",
+    name: "Apollo Mammography Unit 1",
+    type: "Mammography",
+    location: "Apollo, Ahmedabad",
+    status: "Active",
+    txToday: 64, yieldToday: 1.84,
+    txWeek: 442, txMonth: 1920, yieldMonth: 68.4,
+    revenueGeneratedAED: 142_800,
+    trend: [10, 12, 14, 16, 18, 20, 22],
+    dailyTx: [48, 52, 58, 56, 60, 62, 64],
+    dailyYield: [1.32, 1.46, 1.58, 1.52, 1.68, 1.74, 1.84],
+    monthlyYield: [48, 54, 58, 62, 66, 68],
+    assetIds: [],
+    totalSupply: 45000, ownedSince: "Mar 03, 2025", launchDate: "Oct 2024",
+    manufacturer: "Hologic", model: "3Dimensions Mammography",
+    serial: "HOL-3D-AMD-018", commissioned: "Sep 22, 2024",
+    uptimePct: 98.8, utilizationPct: 86,
+    lifetimeTx: 6840, lifetimeYield: 488.6, avgYieldPerTx: 0.071,
+    currentAPY: 12.2, totalStaked: 22100, numInvestors: 74, badge: "New",
+    bucketId: "ahmedabad",
+    peakHours: "10:00–14:00", avgDailyScans: 58,
+    scansToday: 64, scansWeek: 442, scansMonth: 1920,
+  },
+  {
+    id: "PET-AMD-009",
+    name: "Sterling PET Scanner 9",
+    type: "PET Scan",
+    location: "Sterling Hospital, Ahmedabad",
+    status: "Active",
+    txToday: 42, yieldToday: 3.12,
+    txWeek: 286, txMonth: 1240, yieldMonth: 96.4,
+    revenueGeneratedAED: 224_800,
+    trend: [8, 10, 12, 14, 14, 16, 18],
+    dailyTx: [30, 34, 38, 36, 40, 38, 42],
+    dailyYield: [2.18, 2.46, 2.78, 2.62, 2.94, 2.82, 3.12],
+    monthlyYield: [68, 74, 82, 86, 92, 96],
+    assetIds: [],
+    totalSupply: 55000, ownedSince: "Apr 10, 2025", launchDate: "Feb 2024",
+    manufacturer: "Siemens Healthineers", model: "Biograph Vision PET/CT",
+    serial: "SH-BV-AMD-009", commissioned: "Jan 18, 2024",
+    uptimePct: 97.6, utilizationPct: 82,
+    lifetimeTx: 4820, lifetimeYield: 412.8, avgYieldPerTx: 0.086,
+    currentAPY: 13.6, totalStaked: 31200, numInvestors: 108, badge: null,
+    bucketId: "ahmedabad",
+    peakHours: "08:00–11:00", avgDailyScans: 38,
+    scansToday: 42, scansWeek: 286, scansMonth: 1240,
   },
 ];
 
@@ -364,7 +465,19 @@ export interface AssetBucket {
   name: string;
   thesis: string;
   region: string;
+  country: string;
+  status: "Live" | "Onboarding" | "Paused";
+  launchDate: string;
   machineIds: string[];
+  /** machines with at least one investor staking */
+  activeStaking: number;
+  /** seed totals — sim engine adds today's live deltas on top */
+  txTodaySeed: number;
+  txMonthSeed: number;
+  revenueGeneratedAED: number;
+  yieldGeneratedMDMT: number;
+  utilizationPct: number;
+  topMachineId: string;
   /** investor's MDMT tokens held in this bucket */
   myTokens: number;
   /** lifetime MDMT yield earned from this bucket by the investor (seed baseline) */
@@ -376,39 +489,67 @@ export interface AssetBucket {
 
 export const assetBuckets: AssetBucket[] = [
   {
-    id: "alpha",
-    name: "Asset Bucket Alpha",
-    thesis: "Dubai diagnostics cluster — premium MRI + CT throughput in high-demand corridors.",
-    region: "Dubai, UAE",
-    machineIds: ["MRI-DXB-003", "MRI-DXB-014", "CT-DXB-002"],
-    myTokens: 12_640,
-    lifetimeYield: 1_988.4,
-    apyPct: 14.2,
+    id: "dubai",
+    name: "Dubai Asset Bucket",
+    thesis: "Premium MRI + CT throughput in Dubai's highest-demand diagnostic corridors.",
+    region: "Dubai", country: "UAE", status: "Live", launchDate: "Jan 2024",
+    machineIds: ["MRI-DXB-003"],
+    activeStaking: 3, txTodaySeed: 1245, txMonthSeed: 38420,
+    revenueGeneratedAED: 215_000, yieldGeneratedMDMT: 4125, utilizationPct: 91,
+    topMachineId: "MRI-DXB-003",
+    myTokens: 12_640, lifetimeYield: 1_988.4, apyPct: 14.2,
     trend: [4.2, 4.4, 4.6, 4.5, 4.8, 5.1, 5.3, 5.2, 5.6, 5.8, 6.0, 6.3, 6.5, 6.8],
   },
   {
-    id: "beta",
-    name: "Asset Bucket Beta",
-    thesis: "Mumbai imaging + pathology — high-volume, mid-ticket diagnostic flow.",
-    region: "Mumbai, India",
-    machineIds: ["CT-MUM-011", "LAB-MUM-021"],
-    myTokens: 7_310,
-    lifetimeYield: 1_146.8,
-    apyPct: 12.8,
+    id: "mumbai",
+    name: "Mumbai Asset Bucket",
+    thesis: "High-volume imaging + pathology across India's largest diagnostic market.",
+    region: "Mumbai", country: "India", status: "Live", launchDate: "Apr 2023",
+    machineIds: ["CT-MUM-011"],
+    activeStaking: 2, txTodaySeed: 982, txMonthSeed: 28640,
+    revenueGeneratedAED: 168_400, yieldGeneratedMDMT: 3284, utilizationPct: 88,
+    topMachineId: "CT-MUM-011",
+    myTokens: 7_310, lifetimeYield: 1_146.8, apyPct: 12.8,
     trend: [3.1, 3.3, 3.2, 3.5, 3.6, 3.8, 3.7, 4.0, 4.1, 4.3, 4.4, 4.6, 4.7, 4.9],
   },
   {
-    id: "gamma",
-    name: "Asset Bucket Gamma",
-    thesis: "Multi-region (Riyadh · Singapore · London) — diversified premium diagnostics.",
-    region: "RUH · SGP · LON",
-    machineIds: ["MRI-SGP-007", "CT-RUH-022", "LAB-RUH-031", "CT-LON-009"],
-    myTokens: 8_500,
-    lifetimeYield: 1_083.6,
-    apyPct: 13.4,
-    trend: [3.4, 3.6, 3.8, 3.7, 3.9, 4.0, 4.2, 4.3, 4.4, 4.5, 4.7, 4.8, 5.0, 5.1],
+    id: "abudhabi",
+    name: "Abu Dhabi Asset Bucket",
+    thesis: "Sheikh-Zayed corridor diagnostics — CT, ultrasound and women's health imaging.",
+    region: "Abu Dhabi", country: "UAE", status: "Live", launchDate: "Aug 2024",
+    machineIds: ["CT-RUH-022", "ULTRA-AUH-041"],
+    activeStaking: 2, txTodaySeed: 810, txMonthSeed: 22480,
+    revenueGeneratedAED: 138_600, yieldGeneratedMDMT: 2724, utilizationPct: 92,
+    topMachineId: "CT-RUH-022",
+    myTokens: 6_800, lifetimeYield: 988.2, apyPct: 13.1,
+    trend: [3.0, 3.2, 3.4, 3.3, 3.6, 3.8, 4.0, 3.9, 4.2, 4.4, 4.5, 4.7, 4.8, 5.0],
+  },
+  {
+    id: "ahmedabad",
+    name: "Ahmedabad Asset Bucket",
+    thesis: "Gujarat diagnostic expansion — mammography, PET-CT and women's preventive care.",
+    region: "Ahmedabad", country: "India", status: "Live", launchDate: "Oct 2024",
+    machineIds: ["MAMMO-AMD-018", "PET-AMD-009"],
+    activeStaking: 2, txTodaySeed: 642, txMonthSeed: 18920,
+    revenueGeneratedAED: 112_800, yieldGeneratedMDMT: 2148, utilizationPct: 84,
+    topMachineId: "PET-AMD-009",
+    myTokens: 4_200, lifetimeYield: 612.4, apyPct: 12.6,
+    trend: [2.4, 2.6, 2.7, 2.8, 3.0, 3.1, 3.2, 3.4, 3.5, 3.6, 3.8, 3.9, 4.0, 4.2],
+  },
+  {
+    id: "london",
+    name: "London Asset Bucket",
+    thesis: "Harley-Street premium diagnostics — high-ticket imaging and specialist scans.",
+    region: "London", country: "United Kingdom", status: "Live", launchDate: "Mar 2024",
+    machineIds: ["MRI-SGP-007"],
+    activeStaking: 1, txTodaySeed: 384, txMonthSeed: 11240,
+    revenueGeneratedAED: 96_400, yieldGeneratedMDMT: 1842, utilizationPct: 78,
+    topMachineId: "MRI-SGP-007",
+    myTokens: 4_200, lifetimeYield: 642.8, apyPct: 12.4,
+    trend: [2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6],
   },
 ];
+
 
 export function findBucket(id: string) {
   return assetBuckets.find((b) => b.id === id);

@@ -34,30 +34,46 @@ function BucketPage() {
   const s = useSim();
 
   // What share of the platform engine yield belongs to this bucket?
-  // Approximation: bucket's machine count / total machines, but scoped via simEngine machines.
   const simMachines = machinesInBucket(bucket.id as BucketKey);
   const txInBucket = s.feed.filter((t) => t.bucketId === bucket.id);
-  const todayYield = txInBucket.reduce((a, t) => a + t.yieldMDMT, 0);
+  const sessionTxRevenue = txInBucket.reduce((a, t) => a + t.revenueAED, 0);
+  const sessionYield = txInBucket.reduce((a, t) => a + t.yieldMDMT, 0);
+
+  // Live totals add session deltas on top of seed snapshot
+  const liveTxToday = bucket.txTodaySeed + txInBucket.length;
+  const liveRevenueToday = bucket.revenueGeneratedAED + sessionTxRevenue;
+  const liveYieldToday = bucket.yieldGeneratedMDMT + sessionYield;
 
   // Linked physical machine records (for richer detail)
   const machineRecords = machines.filter((m) => bucket.machineIds.includes(m.id));
+  const topMachine = machines.find((m) => m.id === bucket.topMachineId);
 
   return (
-    <AppShell title={bucket.name} subtitle={bucket.region} back wide>
+    <AppShell title={bucket.name} subtitle={`${bucket.region} · ${bucket.country}`} back wide>
       <div className="bg-gradient-hero shadow-glow mt-4 rounded-3xl border border-white/10 p-5">
         <div className="flex items-center justify-between">
           <span className="bg-gradient-brand-soft inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium">
-            <Layers size={11} /> Bucket {bucket.id.toUpperCase()}
+            <Layers size={11} /> {bucket.country} · Launched {bucket.launchDate}
           </span>
           <span className="bg-success/15 text-success rounded-full px-2 py-0.5 text-[10px] font-medium">
-            {bucket.apyPct}% APY
+            ● {bucket.status} · {bucket.apyPct}% APY
           </span>
         </div>
         <p className="text-muted-foreground mt-3 text-sm leading-relaxed">{bucket.thesis}</p>
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <Tile label="Total Machines" value={String(bucket.machineIds.length)} />
+          <Tile label="Active Staking" value={String(bucket.activeStaking)} />
+          <Tile label="Tx Today" live={<AnimatedNumber value={liveTxToday} decimals={0} locale />} />
+          <Tile label="Tx This Month" value={bucket.txMonthSeed.toLocaleString()} />
+          <Tile label="Revenue (AED)" live={<AnimatedNumber value={liveRevenueToday} decimals={0} locale />} />
+          <Tile label="Yield (MDMT)" live={<AnimatedNumber value={liveYieldToday} decimals={1} locale />} accent />
+          <Tile label="Utilization" value={`${bucket.utilizationPct}%`} />
+          <Tile label="Top Machine" value={topMachine?.id ?? bucket.topMachineId} />
+        </div>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <Tile label="Machines" value={String(bucket.machineIds.length)} />
           <Tile label="My MDMT" value={bucket.myTokens.toLocaleString()} />
           <Tile label="Lifetime Yield" value={fmtMdmt(bucket.lifetimeYield, 1)} accent />
+          <Tile label="Region" value={bucket.region} />
         </div>
       </div>
 
@@ -72,7 +88,7 @@ function BucketPage() {
             />
             <Tile
               label="Yield (MDMT)"
-              live={<AnimatedNumber value={todayYield} decimals={3} />}
+              live={<AnimatedNumber value={sessionYield} decimals={3} />}
               accent
             />
           </div>
@@ -90,25 +106,41 @@ function BucketPage() {
           const machineYield = machineTx.reduce((a, t) => a + t.yieldMDMT, 0);
           const inner = (
             <>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-3">
                   <span className="bg-gradient-brand-soft grid h-10 w-10 place-items-center rounded-xl">
                     <Cpu size={16} />
                   </span>
-                  <div>
-                    <p className="font-mono text-sm font-semibold">{sm.id}</p>
-                    <p className="text-muted-foreground text-[11px]">{sm.type}</p>
+                  <div className="min-w-0">
+                    <p className="truncate font-mono text-sm font-semibold">{sm.id}</p>
+                    <p className="text-muted-foreground truncate text-[11px]">
+                      {sm.type}{rec?.launchDate ? ` · since ${rec.launchDate}` : ""}
+                    </p>
                   </div>
                 </div>
-                <Status status={sm.status} />
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <Status status={sm.status} />
+                  {rec?.badge && (
+                    <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${
+                      rec.badge === "Top Performing" ? "bg-gradient-brand text-white" :
+                      rec.badge === "New" ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"
+                    }`}>{rec.badge}</span>
+                  )}
+                  {rec?.myStake && rec.myStake > 0 && (
+                    <span className="bg-success/15 text-success rounded-full px-2 py-0.5 text-[9px] font-medium">Invested</span>
+                  )}
+                </div>
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2">
-                <Tile label="Tx (live)" value={String(machineTx.length)} />
-                <Tile label="Revenue" value={`AED ${machineTx.reduce((a, t) => a + t.revenueAED, 0).toFixed(0)}`} />
-                <Tile label="Yield" value={`+${machineYield.toFixed(3)}`} accent />
+                <Tile label="Tx Today" value={rec ? String(rec.txToday) : String(machineTx.length)} />
+                <Tile label="Tx This Month" value={rec?.txMonth?.toLocaleString() ?? "—"} />
+                <Tile label="APY" value={rec?.currentAPY ? `${rec.currentAPY}%` : "—"} accent />
+                <Tile label="Total Staked" value={rec?.totalStaked ? `${(rec.totalStaked / 1000).toFixed(1)}k` : "—"} />
+                <Tile label="Investors" value={rec?.numInvestors ? String(rec.numInvestors) : "—"} />
+                <Tile label="Live Yield" value={`+${machineYield.toFixed(3)}`} accent />
               </div>
               <div className="text-primary mt-3 flex items-center justify-center gap-1 rounded-xl border border-primary/30 py-2 text-xs font-medium">
-                {rec ? "Open machine" : "Coming soon"} <ChevronRight size={12} />
+                {rec ? (rec.myStake && rec.myStake > 0 ? "Manage stake" : "Stake now") : "Coming soon"} <ChevronRight size={12} />
               </div>
             </>
           );

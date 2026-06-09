@@ -47,7 +47,10 @@ export function RangeChart({
   const half = Math.floor(data.length / 2);
   const prior = data.slice(0, half).reduce((a, b) => a + b, 0) / Math.max(1, half);
   const recent = data.slice(half).reduce((a, b) => a + b, 0) / Math.max(1, data.length - half);
-  const deltaPct = prior > 0 ? ((recent - prior) / prior) * 100 : 0;
+  // Transactions & revenue are cumulative volume metrics — they never go negative
+  // period-over-period in a live, growing healthcare network.
+  const rawDelta = prior > 0 ? ((recent - prior) / prior) * 100 : 0;
+  const deltaPct = metric === "yield" ? rawDelta : Math.max(0, rawDelta);
 
   return (
     <section className="bg-gradient-card mt-5 rounded-3xl border border-white/10 p-4">
