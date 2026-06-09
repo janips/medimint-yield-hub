@@ -120,6 +120,7 @@ function MarketPage() {
           </Link>
         ))}
       </div>
+      )}
     </AppShell>
   );
 }
