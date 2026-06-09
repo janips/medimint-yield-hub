@@ -18,9 +18,15 @@ interface Props {
 }
 
 const METRIC_LABEL: Record<Metric, string> = {
-  tx: "Transactions",
+  tx: "Scans (count)",
   revenue: "Revenue (AED)",
   yield: "Yield (MDMT)",
+};
+
+const METRIC_HINT: Record<Metric, string> = {
+  tx: "Number of diagnostic scans performed across machines.",
+  revenue: "Operator revenue in AED billed to clinics & insurance.",
+  yield: "MDMT tokens distributed to investors (~3 MDMT per scan).",
 };
 
 export function RangeChart({
@@ -79,6 +85,7 @@ export function RangeChart({
           {deltaPct.toFixed(1)}%
         </span>
       </div>
+      <p className="text-muted-foreground mt-1 text-[10px] leading-snug">{METRIC_HINT[metric]}</p>
       <div className="mt-2">
         <AnimatePresence mode="wait">
           <motion.div

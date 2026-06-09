@@ -74,7 +74,7 @@ export function AppShell({ children, title, subtitle, back, hideNav, right, wide
             </Link>
           </div>
         </header>
-        <main className={`px-5 lg:px-8 ${wide ? "lg:max-w-[1320px]" : "lg:max-w-[960px]"}`}>
+        <main className={`px-5 lg:px-10 xl:px-12 ${wide ? "lg:max-w-[1480px] xl:max-w-[1640px]" : "lg:max-w-[1040px]"}`}>
           {children}
         </main>
         {!hideNav && (
