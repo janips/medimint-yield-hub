@@ -465,7 +465,19 @@ export interface AssetBucket {
   name: string;
   thesis: string;
   region: string;
+  country: string;
+  status: "Live" | "Onboarding" | "Paused";
+  launchDate: string;
   machineIds: string[];
+  /** machines with at least one investor staking */
+  activeStaking: number;
+  /** seed totals — sim engine adds today's live deltas on top */
+  txTodaySeed: number;
+  txMonthSeed: number;
+  revenueGeneratedAED: number;
+  yieldGeneratedMDMT: number;
+  utilizationPct: number;
+  topMachineId: string;
   /** investor's MDMT tokens held in this bucket */
   myTokens: number;
   /** lifetime MDMT yield earned from this bucket by the investor (seed baseline) */
@@ -477,39 +489,67 @@ export interface AssetBucket {
 
 export const assetBuckets: AssetBucket[] = [
   {
-    id: "alpha",
-    name: "Asset Bucket Alpha",
-    thesis: "Dubai diagnostics cluster — premium MRI + CT throughput in high-demand corridors.",
-    region: "Dubai, UAE",
-    machineIds: ["MRI-DXB-003", "MRI-DXB-014", "CT-DXB-002"],
-    myTokens: 12_640,
-    lifetimeYield: 1_988.4,
-    apyPct: 14.2,
+    id: "dubai",
+    name: "Dubai Asset Bucket",
+    thesis: "Premium MRI + CT throughput in Dubai's highest-demand diagnostic corridors.",
+    region: "Dubai", country: "UAE", status: "Live", launchDate: "Jan 2024",
+    machineIds: ["MRI-DXB-003"],
+    activeStaking: 3, txTodaySeed: 1245, txMonthSeed: 38420,
+    revenueGeneratedAED: 215_000, yieldGeneratedMDMT: 4125, utilizationPct: 91,
+    topMachineId: "MRI-DXB-003",
+    myTokens: 12_640, lifetimeYield: 1_988.4, apyPct: 14.2,
     trend: [4.2, 4.4, 4.6, 4.5, 4.8, 5.1, 5.3, 5.2, 5.6, 5.8, 6.0, 6.3, 6.5, 6.8],
   },
   {
-    id: "beta",
-    name: "Asset Bucket Beta",
-    thesis: "Mumbai imaging + pathology — high-volume, mid-ticket diagnostic flow.",
-    region: "Mumbai, India",
-    machineIds: ["CT-MUM-011", "LAB-MUM-021"],
-    myTokens: 7_310,
-    lifetimeYield: 1_146.8,
-    apyPct: 12.8,
+    id: "mumbai",
+    name: "Mumbai Asset Bucket",
+    thesis: "High-volume imaging + pathology across India's largest diagnostic market.",
+    region: "Mumbai", country: "India", status: "Live", launchDate: "Apr 2023",
+    machineIds: ["CT-MUM-011"],
+    activeStaking: 2, txTodaySeed: 982, txMonthSeed: 28640,
+    revenueGeneratedAED: 168_400, yieldGeneratedMDMT: 3284, utilizationPct: 88,
+    topMachineId: "CT-MUM-011",
+    myTokens: 7_310, lifetimeYield: 1_146.8, apyPct: 12.8,
     trend: [3.1, 3.3, 3.2, 3.5, 3.6, 3.8, 3.7, 4.0, 4.1, 4.3, 4.4, 4.6, 4.7, 4.9],
   },
   {
-    id: "gamma",
-    name: "Asset Bucket Gamma",
-    thesis: "Multi-region (Riyadh · Singapore · London) — diversified premium diagnostics.",
-    region: "RUH · SGP · LON",
-    machineIds: ["MRI-SGP-007", "CT-RUH-022", "LAB-RUH-031", "CT-LON-009"],
-    myTokens: 8_500,
-    lifetimeYield: 1_083.6,
-    apyPct: 13.4,
-    trend: [3.4, 3.6, 3.8, 3.7, 3.9, 4.0, 4.2, 4.3, 4.4, 4.5, 4.7, 4.8, 5.0, 5.1],
+    id: "abudhabi",
+    name: "Abu Dhabi Asset Bucket",
+    thesis: "Sheikh-Zayed corridor diagnostics — CT, ultrasound and women's health imaging.",
+    region: "Abu Dhabi", country: "UAE", status: "Live", launchDate: "Aug 2024",
+    machineIds: ["CT-RUH-022", "ULTRA-AUH-041"],
+    activeStaking: 2, txTodaySeed: 810, txMonthSeed: 22480,
+    revenueGeneratedAED: 138_600, yieldGeneratedMDMT: 2724, utilizationPct: 92,
+    topMachineId: "CT-RUH-022",
+    myTokens: 6_800, lifetimeYield: 988.2, apyPct: 13.1,
+    trend: [3.0, 3.2, 3.4, 3.3, 3.6, 3.8, 4.0, 3.9, 4.2, 4.4, 4.5, 4.7, 4.8, 5.0],
+  },
+  {
+    id: "ahmedabad",
+    name: "Ahmedabad Asset Bucket",
+    thesis: "Gujarat diagnostic expansion — mammography, PET-CT and women's preventive care.",
+    region: "Ahmedabad", country: "India", status: "Live", launchDate: "Oct 2024",
+    machineIds: ["MAMMO-AMD-018", "PET-AMD-009"],
+    activeStaking: 2, txTodaySeed: 642, txMonthSeed: 18920,
+    revenueGeneratedAED: 112_800, yieldGeneratedMDMT: 2148, utilizationPct: 84,
+    topMachineId: "PET-AMD-009",
+    myTokens: 4_200, lifetimeYield: 612.4, apyPct: 12.6,
+    trend: [2.4, 2.6, 2.7, 2.8, 3.0, 3.1, 3.2, 3.4, 3.5, 3.6, 3.8, 3.9, 4.0, 4.2],
+  },
+  {
+    id: "london",
+    name: "London Asset Bucket",
+    thesis: "Harley-Street premium diagnostics — high-ticket imaging and specialist scans.",
+    region: "London", country: "United Kingdom", status: "Live", launchDate: "Mar 2024",
+    machineIds: ["MRI-SGP-007"],
+    activeStaking: 1, txTodaySeed: 384, txMonthSeed: 11240,
+    revenueGeneratedAED: 96_400, yieldGeneratedMDMT: 1842, utilizationPct: 78,
+    topMachineId: "MRI-SGP-007",
+    myTokens: 4_200, lifetimeYield: 642.8, apyPct: 12.4,
+    trend: [2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6],
   },
 ];
+
 
 export function findBucket(id: string) {
   return assetBuckets.find((b) => b.id === id);
