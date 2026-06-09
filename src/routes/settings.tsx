@@ -59,19 +59,22 @@ function Section({ title, icon, children }: { title: string; icon: React.ReactNo
 
 function Toggle({ icon, label, desc, on, onChange }: { icon?: React.ReactNode; label: string; desc: string; on: boolean; onChange: (v: boolean) => void }) {
   return (
-    <div className="bg-gradient-card flex items-center justify-between rounded-2xl border border-white/10 p-4">
-      <div className="flex items-center gap-3">
-        {icon && <span className="bg-gradient-brand-soft grid h-9 w-9 place-items-center rounded-xl">{icon}</span>}
-        <div>
-          <p className="text-sm font-medium">{label}</p>
-          <p className="text-muted-foreground text-[11px]">{desc}</p>
+    <div className="bg-gradient-card flex items-center justify-between gap-3 rounded-2xl border border-white/10 p-4">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        {icon && <span className="bg-gradient-brand-soft grid h-9 w-9 shrink-0 place-items-center rounded-xl">{icon}</span>}
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium">{label}</p>
+          <p className="text-muted-foreground truncate text-[11px]">{desc}</p>
         </div>
       </div>
       <button
         onClick={() => onChange(!on)}
-        className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${on ? "bg-gradient-brand" : "bg-white/15"}`}
+        role="switch"
+        aria-checked={on}
+        aria-label={label}
+        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${on ? "bg-gradient-brand" : "bg-white/15"}`}
       >
-        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${on ? "translate-x-5" : "translate-x-0.5"}`} />
+        <span className={`absolute top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-white shadow transition-transform ${on ? "translate-x-[1.375rem]" : "translate-x-0.5"}`} />
       </button>
     </div>
   );

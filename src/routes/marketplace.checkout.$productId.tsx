@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HashChip } from "@/components/HashChip";
 import {
-  findProduct, paymentMethods, portfolio, MDMT_TO_AED,
+  findProduct, paymentMethods, portfolio, MDMT_TO_AED, MDMT_TO_USD,
   type PaymentMethodId,
 } from "@/lib/mockData";
 import { Check, Download, ShoppingBag, CreditCard } from "lucide-react";
@@ -52,7 +52,7 @@ function CheckoutPage() {
               </div>
               <div className="text-right">
                 <p className="font-display text-sm font-semibold">{product.price} MDMT</p>
-                <p className="text-muted-foreground text-[10px]">≈ AED {(product.price * MDMT_TO_AED).toFixed(0)}</p>
+                <p className="text-muted-foreground text-[10px]">${(product.price * MDMT_TO_USD).toFixed(2)} USD · AED {(product.price * MDMT_TO_AED).toFixed(0)}</p>
               </div>
             </div>
             <div className="mt-4 space-y-1.5 border-t border-white/10 pt-3 text-xs">

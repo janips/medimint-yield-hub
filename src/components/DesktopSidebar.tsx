@@ -23,7 +23,9 @@ export function DesktopSidebar() {
   return (
     <aside className="hidden lg:flex sticky top-0 h-screen w-[248px] shrink-0 flex-col border-r border-white/10 bg-black/30 px-4 py-5 backdrop-blur-xl">
       <div className="px-2 pb-4">
-        <BrandLogo height={28} />
+        <div className="inline-flex items-center rounded-xl bg-white px-3 py-1.5 shadow-sm">
+          <BrandLogo height={24} variant="light" />
+        </div>
       </div>
       <nav className="mt-2 flex-1 space-y-0.5 overflow-y-auto pr-1">
         {items.map((t) => {

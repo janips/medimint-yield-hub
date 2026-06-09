@@ -45,9 +45,9 @@ export function AppShell({ children, title, subtitle, back, hideNav, right, wide
                   {subtitle && <p className="text-muted-foreground truncate text-xs">{subtitle}</p>}
                 </>
               ) : (
-                <div className="lg:hidden">
-                  <BrandLogo height={26} />
-                </div>
+                <Link to="/" className="lg:hidden inline-flex items-center rounded-xl bg-white px-2.5 py-1 shadow-sm">
+                  <BrandLogo height={22} variant="light" />
+                </Link>
               )}
             </div>
           </div>

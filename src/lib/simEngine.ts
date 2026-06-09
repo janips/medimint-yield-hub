@@ -332,7 +332,7 @@ function seeded(n: number) {
   return (Math.abs(x) % 1000) / 1000;
 }
 
-export type Range = "7D" | "30D" | "90D";
+export type Range = "1D" | "7D" | "30D" | "90D" | "ALL";
 
 export interface RangeSeries {
   labels: string[];
@@ -347,12 +347,64 @@ function dayLabel(d: Date) {
 function dowLabel(d: Date) {
   return d.toLocaleDateString(undefined, { weekday: "short" });
 }
+function monthLabel(d: Date) {
+  return d.toLocaleDateString(undefined, { month: "short", year: "2-digit" });
+}
 
-const baselineDailyTx = 880; // matches initial seed
+const baselineDailyTx = 880;
 const baselineYieldRate = 0.020;
 const baselineRevenuePerTx = 150;
 
 export function seriesFor(range: Range, todayTx: number, todayRevenue: number, todayYield: number): RangeSeries {
+  // 1D — intraday hourly breakdown of TODAY
+  if (range === "1D") {
+    const labels: string[] = [];
+    const tx: number[] = [];
+    const revenueAED: number[] = [];
+    const yieldMDMT: number[] = [];
+    const currentHour = new Date().getHours();
+    const curve: number[] = [];
+    let curveSum = 0;
+    for (let h = 0; h <= currentHour; h++) {
+      const v = Math.max(0.05, 1 - Math.abs((h - 12) / 9));
+      curve.push(v);
+      curveSum += v;
+    }
+    for (let h = 0; h < 24; h++) {
+      labels.push(`${String(h).padStart(2, "0")}h`);
+      if (h <= currentHour && curveSum > 0) {
+        const w = curve[h] / curveSum;
+        tx.push(Math.round(todayTx * w));
+        revenueAED.push(Math.round(todayRevenue * w));
+        yieldMDMT.push(+(todayYield * w).toFixed(1));
+      } else {
+        tx.push(0); revenueAED.push(0); yieldMDMT.push(0);
+      }
+    }
+    return { labels: labels.map((l, i) => (i % 3 === 0 ? l : "")), tx, revenueAED, yieldMDMT };
+  }
+
+  // ALL — 12 months
+  if (range === "ALL") {
+    const labels: string[] = [];
+    const tx: number[] = [];
+    const revenueAED: number[] = [];
+    const yieldMDMT: number[] = [];
+    const now = new Date();
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      labels.push(monthLabel(d));
+      const growth = Math.pow(1.03, 11 - i);
+      const noise = 0.92 + seeded(d.getFullYear() * 100 + d.getMonth()) * 0.18;
+      const monthTx = Math.round(baselineDailyTx * 30 * growth * noise * 0.85);
+      const monthRev = Math.round(monthTx * baselineRevenuePerTx);
+      tx.push(monthTx);
+      revenueAED.push(monthRev);
+      yieldMDMT.push(+(monthRev * baselineYieldRate).toFixed(1));
+    }
+    return { labels, tx, revenueAED, yieldMDMT };
+  }
+
   const days = range === "7D" ? 7 : range === "30D" ? 30 : 90;
   const labels: string[] = [];
   const tx: number[] = [];
@@ -363,15 +415,10 @@ export function seriesFor(range: Range, todayTx: number, todayRevenue: number, t
     const d = new Date();
     d.setDate(d.getDate() - i);
     labels.push(days <= 7 ? dowLabel(d) : dayLabel(d));
-
-    // weekday utilization curve (lower weekend)
     const dow = d.getDay();
     const weekdayBoost = dow === 0 || dow === 6 ? 0.78 : 1.0;
-    // multi-month seasonal drift (cosine over 90 days)
     const seasonal = 0.92 + 0.12 * Math.cos(((days - i) / 90) * Math.PI * 2);
-    // deterministic per-day noise
     const noise = 0.88 + seeded(d.getFullYear() * 1000 + d.getMonth() * 40 + d.getDate()) * 0.24;
-
     if (i === 0) {
       tx.push(Math.round(todayTx));
       revenueAED.push(Math.round(todayRevenue));
@@ -379,26 +426,14 @@ export function seriesFor(range: Range, todayTx: number, todayRevenue: number, t
     } else {
       const dayTx = Math.round(baselineDailyTx * weekdayBoost * seasonal * noise);
       const dayRev = Math.round(dayTx * (baselineRevenuePerTx * (0.92 + seeded(d.getDate() + dow) * 0.18)));
-      const dayYield = +(dayRev * baselineYieldRate).toFixed(1);
       tx.push(dayTx);
       revenueAED.push(dayRev);
-      yieldMDMT.push(dayYield);
+      yieldMDMT.push(+(dayRev * baselineYieldRate).toFixed(1));
     }
   }
 
-  // For 90D, decimate labels for readability (every 10th)
-  if (range === "90D") {
-    return {
-      labels: labels.map((l, i) => (i % 10 === 0 ? l : "")),
-      tx, revenueAED, yieldMDMT,
-    };
-  }
-  if (range === "30D") {
-    return {
-      labels: labels.map((l, i) => (i % 5 === 0 ? l : "")),
-      tx, revenueAED, yieldMDMT,
-    };
-  }
+  if (range === "90D") return { labels: labels.map((l, i) => (i % 10 === 0 ? l : "")), tx, revenueAED, yieldMDMT };
+  if (range === "30D") return { labels: labels.map((l, i) => (i % 5 === 0 ? l : "")), tx, revenueAED, yieldMDMT };
   return { labels, tx, revenueAED, yieldMDMT };
 }
 

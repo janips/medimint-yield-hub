@@ -1,14 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { marketplace, marketCategories } from "@/lib/mockData";
+import { marketplace, marketCategories, paymentMethods, MDMT_TO_USD } from "@/lib/mockData";
 import { Search, Star } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace")({
   head: () => ({
     meta: [
       { title: "Marketplace — Medimint" },
-      { name: "description", content: "Spend MDMT on diagnostics, consultations, supplements, and wellness." },
+      { name: "description", content: "Spend MDMT, USD, card, Apple Pay, Google Pay or UPI on diagnostics, consultations, supplements, and wellness." },
     ],
   }),
   component: MarketPage,
@@ -22,7 +22,7 @@ function MarketPage() {
     .filter((m) => !q || (m.title + m.blurb).toLowerCase().includes(q.toLowerCase()));
 
   return (
-    <AppShell title="Marketplace" subtitle="Pay with MDMT">
+    <AppShell title="Marketplace" subtitle="Pay with MDMT, card, Apple/Google Pay or UPI">
       <div className="bg-card/60 mt-4 flex items-center gap-2 rounded-2xl border border-white/10 px-3 py-2.5">
         <Search size={14} className="text-muted-foreground" />
         <input
@@ -31,6 +31,21 @@ function MarketPage() {
           placeholder="Search services, packages…"
           className="placeholder:text-muted-foreground w-full bg-transparent text-sm outline-none"
         />
+      </div>
+
+      {/* Accepted payment methods strip */}
+      <div className="bg-gradient-card mt-3 flex items-center gap-2 overflow-x-auto rounded-2xl border border-white/10 px-3 py-2 text-[11px]">
+        <span className="text-muted-foreground shrink-0">We accept</span>
+        {paymentMethods.map((p) => (
+          <span
+            key={p.id}
+            className="shrink-0 inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1"
+            title={p.label}
+          >
+            <span className="text-sm">{p.emoji || "💳"}</span>
+            <span className="text-muted-foreground">{p.label.replace("Pay with ", "")}</span>
+          </span>
+        ))}
       </div>
 
       <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1">
@@ -54,7 +69,10 @@ function MarketPage() {
         <h3 className="font-display mt-1 text-xl font-semibold">Longevity Diagnostic Panel</h3>
         <p className="text-muted-foreground mt-1 text-xs">180-biomarker full-body panel · partner clinics in 12 cities.</p>
         <div className="mt-4 flex items-center justify-between">
-          <span className="font-display text-2xl font-semibold">240 MDMT</span>
+          <div>
+            <span className="font-display text-2xl font-semibold">240 MDMT</span>
+            <span className="text-muted-foreground ml-2 text-xs">≈ ${(240 * MDMT_TO_USD).toFixed(0)} USD</span>
+          </div>
           <span className="bg-gradient-brand shadow-glow rounded-full px-4 py-2 text-xs font-semibold text-white">Explore</span>
         </div>
       </Link>
@@ -75,9 +93,15 @@ function MarketPage() {
             <div className="text-muted-foreground mt-1 flex items-center gap-1 text-[10px]">
               <Star size={9} className="fill-warning text-warning" /> {m.rating} · {m.reviewCount}
             </div>
-            <div className="mt-2 flex items-center justify-between">
-              <span className="font-display text-sm font-semibold">{m.price} MDMT</span>
+            <div className="mt-2 flex items-end justify-between">
+              <div>
+                <p className="font-display text-sm font-semibold leading-tight">{m.price} MDMT</p>
+                <p className="text-muted-foreground text-[10px] leading-tight">≈ ${(m.price * MDMT_TO_USD).toFixed(0)} USD</p>
+              </div>
               <span className="border-primary/40 text-primary rounded-full border px-3 py-1 text-[11px] font-medium">Buy</span>
+            </div>
+            <div className="text-muted-foreground mt-2 flex items-center gap-1 border-t border-white/5 pt-2 text-[11px]">
+              <span>💎</span><span>💳</span><span></span><span>🅖</span><span>🇮🇳</span>
             </div>
           </Link>
         ))}

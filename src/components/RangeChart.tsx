@@ -61,16 +61,16 @@ export function RangeChart({
           ))}
         </div>
         <div className="bg-secondary/60 inline-flex rounded-full p-1 text-[10px]">
-          {(["7D", "30D", "90D"] as const).map((r) => (
+          {(["1D", "7D", "30D", "ALL"] as const).map((r) => (
             <Btn key={r} active={range === r} onClick={() => setRange(r)}>
-              {r}
+              {r === "ALL" ? "All" : r}
             </Btn>
           ))}
         </div>
       </div>
       <div className="mt-3 flex items-baseline gap-2">
         <span className="font-display text-2xl font-semibold tabular-nums">{formatTotal()}</span>
-        <span className="text-muted-foreground text-xs">total · {range}</span>
+        <span className="text-muted-foreground text-xs">total · {range === "ALL" ? "all time" : range === "1D" ? "today" : range}</span>
         <span className={`ml-auto text-xs ${deltaPct >= 0 ? "text-success" : "text-destructive"}`}>
           {deltaPct >= 0 ? "+" : ""}
           {deltaPct.toFixed(1)}%
