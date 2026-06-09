@@ -70,7 +70,7 @@ export function RangeChart({
       </div>
       <div className="mt-3 flex items-baseline gap-2">
         <span className="font-display text-2xl font-semibold tabular-nums">{formatTotal()}</span>
-        <span className="text-muted-foreground text-xs">total · {range}</span>
+        <span className="text-muted-foreground text-xs">total · {range === "ALL" ? "all time" : range === "1D" ? "today" : range}</span>
         <span className={`ml-auto text-xs ${deltaPct >= 0 ? "text-success" : "text-destructive"}`}>
           {deltaPct >= 0 ? "+" : ""}
           {deltaPct.toFixed(1)}%
