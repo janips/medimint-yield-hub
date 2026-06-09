@@ -106,25 +106,41 @@ function BucketPage() {
           const machineYield = machineTx.reduce((a, t) => a + t.yieldMDMT, 0);
           const inner = (
             <>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-3">
                   <span className="bg-gradient-brand-soft grid h-10 w-10 place-items-center rounded-xl">
                     <Cpu size={16} />
                   </span>
-                  <div>
-                    <p className="font-mono text-sm font-semibold">{sm.id}</p>
-                    <p className="text-muted-foreground text-[11px]">{sm.type}</p>
+                  <div className="min-w-0">
+                    <p className="truncate font-mono text-sm font-semibold">{sm.id}</p>
+                    <p className="text-muted-foreground truncate text-[11px]">
+                      {sm.type}{rec?.launchDate ? ` · since ${rec.launchDate}` : ""}
+                    </p>
                   </div>
                 </div>
-                <Status status={sm.status} />
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <Status status={sm.status} />
+                  {rec?.badge && (
+                    <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${
+                      rec.badge === "Top Performing" ? "bg-gradient-brand text-white" :
+                      rec.badge === "New" ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"
+                    }`}>{rec.badge}</span>
+                  )}
+                  {rec?.myStake && rec.myStake > 0 && (
+                    <span className="bg-success/15 text-success rounded-full px-2 py-0.5 text-[9px] font-medium">Invested</span>
+                  )}
+                </div>
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2">
-                <Tile label="Tx (live)" value={String(machineTx.length)} />
-                <Tile label="Revenue" value={`AED ${machineTx.reduce((a, t) => a + t.revenueAED, 0).toFixed(0)}`} />
-                <Tile label="Yield" value={`+${machineYield.toFixed(3)}`} accent />
+                <Tile label="Tx Today" value={rec ? String(rec.txToday) : String(machineTx.length)} />
+                <Tile label="Tx This Month" value={rec?.txMonth?.toLocaleString() ?? "—"} />
+                <Tile label="APY" value={rec?.currentAPY ? `${rec.currentAPY}%` : "—"} accent />
+                <Tile label="Total Staked" value={rec?.totalStaked ? `${(rec.totalStaked / 1000).toFixed(1)}k` : "—"} />
+                <Tile label="Investors" value={rec?.numInvestors ? String(rec.numInvestors) : "—"} />
+                <Tile label="Live Yield" value={`+${machineYield.toFixed(3)}`} accent />
               </div>
               <div className="text-primary mt-3 flex items-center justify-center gap-1 rounded-xl border border-primary/30 py-2 text-xs font-medium">
-                {rec ? "Open machine" : "Coming soon"} <ChevronRight size={12} />
+                {rec ? (rec.myStake && rec.myStake > 0 ? "Manage stake" : "Stake now") : "Coming soon"} <ChevronRight size={12} />
               </div>
             </>
           );
