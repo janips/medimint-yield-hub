@@ -150,6 +150,13 @@ function TokensTab() {
 }
 
 function MachinesTab() {
+  if (machines.length === 0) {
+    return (
+      <div className="bg-gradient-card mt-6 rounded-2xl border border-white/10 p-8 text-center text-sm text-muted-foreground">
+        No machines linked to your wallet yet.
+      </div>
+    );
+  }
   return (
     <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
       {machines.map((m) => (
