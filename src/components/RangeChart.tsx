@@ -61,9 +61,9 @@ export function RangeChart({
           ))}
         </div>
         <div className="bg-secondary/60 inline-flex rounded-full p-1 text-[10px]">
-          {(["7D", "30D", "90D"] as const).map((r) => (
+          {(["1D", "7D", "30D", "ALL"] as const).map((r) => (
             <Btn key={r} active={range === r} onClick={() => setRange(r)}>
-              {r}
+              {r === "ALL" ? "All" : r}
             </Btn>
           ))}
         </div>
