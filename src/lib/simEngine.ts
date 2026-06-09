@@ -453,8 +453,8 @@ export function seriesFor(range: Range, todayTx: number, todayRevenue: number, t
 
 /* ---------- exposed metadata ---------- */
 
-export const SIM_BUCKETS = ["alpha", "beta", "gamma"] as const;
-export type BucketKey = (typeof SIM_BUCKETS)[number];
+export const SIM_BUCKETS = ["dubai", "mumbai", "abudhabi", "ahmedabad", "london"] as const;
+export type BucketKey = (typeof SIM_BUCKETS)[number] | string;
 
 export function machinesInBucket(bucket: BucketKey): SimMachine[] {
   return SIM_MACHINES.filter((m) => m.bucketId === bucket);
