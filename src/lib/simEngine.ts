@@ -219,7 +219,28 @@ function buildInitial(): SimState {
   };
 }
 
-let state: SimState = buildInitial();
+/** Deterministic, empty snapshot used for SSR so the server-rendered HTML
+ *  matches the very first client paint (no Math.random() leaking into markup). */
+const SERVER_STATE: SimState = {
+  tick: 0,
+  todayTx: 906,
+  todayRevenueAED: 136_000,
+  todayYieldMDMT: 2_720,
+  lifetimeTx: 1_482_400,
+  lifetimeRevenueAED: 222_360_000,
+  lifetimeYieldMDMT: 4_447_200,
+  myYieldToday: portfolio.yieldToday,
+  myYieldLifetime: portfolio.yieldLifetime,
+  activeMachines: SIM_MACHINES.filter((m) => m.status === "Active").length,
+  maintenanceMachines: SIM_MACHINES.filter((m) => m.status === "Maintenance").length,
+  feed: [],
+  liveNotifications: [],
+  lastTx: undefined,
+  now: 0,
+};
+
+let state: SimState = SERVER_STATE;
+let initialized = false;
 const listeners = new Set<() => void>();
 let intervalId: ReturnType<typeof setInterval> | null = null;
 let nowId: ReturnType<typeof setInterval> | null = null;
@@ -228,107 +249,9 @@ let nextNotifId = 100_000;
 function emit() {
   for (const l of listeners) l();
 }
-
-function generateTick() {
-  const machine = pick(SIM_MACHINES.filter((m) => m.status === "Active"));
-  const revenue = +rand(machine.revenueBand[0], machine.revenueBand[1]).toFixed(2);
-  const yieldM = +(revenue * machine.yieldRate).toFixed(4);
-  const { short, full } = newHash();
-
-  const tx: SimTransaction = {
-    id: "TX-" + hex(8),
-    ts: Date.now(),
-    machineId: machine.id,
-    machineType: machine.type,
-    bucketId: machine.bucketId,
-    assetId: pick(ASSETS_FOR_BUCKET[machine.bucketId] ?? ["ASSET-000392"]),
-    type: pick(TX_TYPES_BY_KIND[kindOf(machine.id)]),
-    revenueAED: revenue,
-    yieldMDMT: yieldM,
-    hash: short,
-    fullHash: full,
-    settlement: Math.random() < 0.82 ? "Settled" : Math.random() < 0.6 ? "Confirming" : "Pending",
-  };
-
-  // Investor share of this yield
-  const userDelta = +(yieldM * USER_SHARE).toFixed(4);
-
-  // Occasionally flip a machine into / out of maintenance (≈ every 60 ticks)
-  if (Math.random() < 0.012) {
-    const candidates = SIM_MACHINES;
-    const flip = pick(candidates);
-    if (flip.status === "Active") flip.status = "Maintenance";
-    else if (flip.status === "Maintenance") flip.status = "Active";
-  }
-
-  let liveNotifications = state.liveNotifications;
-  if (Math.random() < 0.45) {
-    const n: Notification & { fullHash?: string } = {
-      id: nextNotifId++,
-      type: "yield",
-      title: "Your asset generated yield",
-      desc: `${machine.id} · +${userDelta.toFixed(4)} MDMT`,
-      time: "just now",
-      hash: short,
-      read: false,
-      link: "/activity",
-    };
-    n.fullHash = full;
-    liveNotifications = [n, ...state.liveNotifications].slice(0, 20);
-  }
-
-  const feed = [tx, ...state.feed].slice(0, 30);
-
-  state = {
-    ...state,
-    tick: state.tick + 1,
-    todayTx: state.todayTx + 1,
-    todayRevenueAED: +(state.todayRevenueAED + revenue).toFixed(2),
-    todayYieldMDMT: +(state.todayYieldMDMT + yieldM).toFixed(4),
-    lifetimeTx: state.lifetimeTx + 1,
-    lifetimeRevenueAED: +(state.lifetimeRevenueAED + revenue).toFixed(2),
-    lifetimeYieldMDMT: +(state.lifetimeYieldMDMT + yieldM).toFixed(4),
-    myYieldToday: +(state.myYieldToday + userDelta).toFixed(4),
-    myYieldLifetime: +(state.myYieldLifetime + userDelta).toFixed(4),
-    activeMachines: SIM_MACHINES.filter((m) => m.status === "Active").length,
-    maintenanceMachines: SIM_MACHINES.filter((m) => m.status === "Maintenance").length,
-    feed,
-    liveNotifications,
-    lastTx: tx,
-    now: Date.now(),
-  };
-  emit();
-  scheduleNext();
-}
-
-function scheduleNext() {
-  if (typeof window === "undefined") return;
-  // jitter between 8s and 18s for a believable cadence
-  const delay = 8000 + Math.random() * 10_000;
-  if (intervalId) clearTimeout(intervalId);
-  intervalId = setTimeout(generateTick, delay);
-}
-
-function ensureRunning() {
-  if (typeof window === "undefined") return;
-  if (!intervalId) scheduleNext();
-  if (!nowId) {
-    nowId = setInterval(() => {
-      state = { ...state, now: Date.now() };
-      emit();
-    }, 1000);
-  }
-}
-
-const subscribe = (l: () => void) => {
-  listeners.add(l);
-  ensureRunning();
-  return () => {
-    listeners.delete(l);
-  };
-};
+...
 const getSnapshot = () => state;
-const getServerSnapshot = () => state;
+const getServerSnapshot = () => SERVER_STATE;
 
 export function useSim(): SimState {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
