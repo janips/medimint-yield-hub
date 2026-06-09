@@ -34,30 +34,46 @@ function BucketPage() {
   const s = useSim();
 
   // What share of the platform engine yield belongs to this bucket?
-  // Approximation: bucket's machine count / total machines, but scoped via simEngine machines.
   const simMachines = machinesInBucket(bucket.id as BucketKey);
   const txInBucket = s.feed.filter((t) => t.bucketId === bucket.id);
-  const todayYield = txInBucket.reduce((a, t) => a + t.yieldMDMT, 0);
+  const sessionTxRevenue = txInBucket.reduce((a, t) => a + t.revenueAED, 0);
+  const sessionYield = txInBucket.reduce((a, t) => a + t.yieldMDMT, 0);
+
+  // Live totals add session deltas on top of seed snapshot
+  const liveTxToday = bucket.txTodaySeed + txInBucket.length;
+  const liveRevenueToday = bucket.revenueGeneratedAED + sessionTxRevenue;
+  const liveYieldToday = bucket.yieldGeneratedMDMT + sessionYield;
 
   // Linked physical machine records (for richer detail)
   const machineRecords = machines.filter((m) => bucket.machineIds.includes(m.id));
+  const topMachine = machines.find((m) => m.id === bucket.topMachineId);
 
   return (
-    <AppShell title={bucket.name} subtitle={bucket.region} back wide>
+    <AppShell title={bucket.name} subtitle={`${bucket.region} · ${bucket.country}`} back wide>
       <div className="bg-gradient-hero shadow-glow mt-4 rounded-3xl border border-white/10 p-5">
         <div className="flex items-center justify-between">
           <span className="bg-gradient-brand-soft inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium">
-            <Layers size={11} /> Bucket {bucket.id.toUpperCase()}
+            <Layers size={11} /> {bucket.country} · Launched {bucket.launchDate}
           </span>
           <span className="bg-success/15 text-success rounded-full px-2 py-0.5 text-[10px] font-medium">
-            {bucket.apyPct}% APY
+            ● {bucket.status} · {bucket.apyPct}% APY
           </span>
         </div>
         <p className="text-muted-foreground mt-3 text-sm leading-relaxed">{bucket.thesis}</p>
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <Tile label="Total Machines" value={String(bucket.machineIds.length)} />
+          <Tile label="Active Staking" value={String(bucket.activeStaking)} />
+          <Tile label="Tx Today" live={<AnimatedNumber value={liveTxToday} decimals={0} locale />} />
+          <Tile label="Tx This Month" value={bucket.txMonthSeed.toLocaleString()} />
+          <Tile label="Revenue (AED)" live={<AnimatedNumber value={liveRevenueToday} decimals={0} locale />} />
+          <Tile label="Yield (MDMT)" live={<AnimatedNumber value={liveYieldToday} decimals={1} locale />} accent />
+          <Tile label="Utilization" value={`${bucket.utilizationPct}%`} />
+          <Tile label="Top Machine" value={topMachine?.id ?? bucket.topMachineId} />
+        </div>
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <Tile label="Machines" value={String(bucket.machineIds.length)} />
           <Tile label="My MDMT" value={bucket.myTokens.toLocaleString()} />
           <Tile label="Lifetime Yield" value={fmtMdmt(bucket.lifetimeYield, 1)} accent />
+          <Tile label="Region" value={bucket.region} />
         </div>
       </div>
 
