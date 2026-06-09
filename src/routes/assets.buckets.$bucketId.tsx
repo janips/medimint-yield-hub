@@ -5,7 +5,8 @@ import { RangeChart } from "@/components/RangeChart";
 import { LiveActivityFeed } from "@/components/LiveActivityFeed";
 import { findBucket, machines, fmtMdmt } from "@/lib/mockData";
 import { useSim, machinesInBucket, type BucketKey } from "@/lib/simEngine";
-import { Cpu, MapPin, Activity, Layers, ChevronRight, TrendingUp } from "lucide-react";
+import { Cpu, Activity, ChevronRight, Layers, TrendingUp } from "lucide-react";
+
 
 export const Route = createFileRoute("/assets/buckets/$bucketId")({
   head: ({ params }) => ({
