@@ -85,6 +85,7 @@ export function RangeChart({
           {deltaPct.toFixed(1)}%
         </span>
       </div>
+      <p className="text-muted-foreground mt-1 text-[10px] leading-snug">{METRIC_HINT[metric]}</p>
       <div className="mt-2">
         <AnimatePresence mode="wait">
           <motion.div
