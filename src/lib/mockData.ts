@@ -354,6 +354,8 @@ export const paymentMethods: PaymentMethod[] = [
 ];
 /** Mock MDMT → AED conversion for fiat checkout. */
 export const MDMT_TO_AED = 18.4;
+/** Mock MDMT → USD conversion (AED → USD ≈ 0.272). */
+export const MDMT_TO_USD = +(MDMT_TO_AED * 0.272).toFixed(2);
 
 /* ---------------- ASSET BUCKETS ---------------- */
 
