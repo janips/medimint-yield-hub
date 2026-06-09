@@ -160,6 +160,9 @@ function newHash() {
 function kindOf(id: string) {
   if (id.startsWith("MRI")) return "MRI";
   if (id.startsWith("CT")) return "CT";
+  if (id.startsWith("ULTRA")) return "ULTRA";
+  if (id.startsWith("MAMMO")) return "MAMMO";
+  if (id.startsWith("PET")) return "PET";
   return "LAB";
 }
 
