@@ -2,8 +2,11 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { HashChip } from "@/components/HashChip";
-import { findProduct, portfolio } from "@/lib/mockData";
-import { Check, Download, ShoppingBag } from "lucide-react";
+import {
+  findProduct, paymentMethods, portfolio, MDMT_TO_AED,
+  type PaymentMethodId,
+} from "@/lib/mockData";
+import { Check, Download, ShoppingBag, CreditCard } from "lucide-react";
 
 export const Route = createFileRoute("/marketplace/checkout/$productId")({
   head: () => ({ meta: [{ title: "Checkout — Medimint" }] }),
@@ -19,15 +22,20 @@ export const Route = createFileRoute("/marketplace/checkout/$productId")({
 
 function CheckoutPage() {
   const { product } = Route.useLoaderData();
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [method, setMethod] = useState<PaymentMethodId>("mdmt");
   const orderNum = "ORD-" + Math.floor(Math.random() * 900000 + 100000);
   const refId = "REF-" + Math.floor(Math.random() * 9000 + 1000);
   const txHash = "0x" + Math.random().toString(16).slice(2, 10).toUpperCase() + "...A9F2";
+  const fullHash = "0x" + Math.random().toString(16).slice(2, 42).toUpperCase();
+
+  const pm = paymentMethods.find((p) => p.id === method)!;
+  const aedAmount = +(product.price * MDMT_TO_AED * (1 + pm.feePct)).toFixed(2);
 
   return (
-    <AppShell title="Checkout" subtitle={`Step ${step} of 3`} back hideNav>
+    <AppShell title="Checkout" subtitle={`Step ${step} of 4`} back hideNav>
       <div className="mt-4 flex gap-1.5">
-        {[1, 2, 3].map((s) => (
+        {[1, 2, 3, 4].map((s) => (
           <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-gradient-brand" : "bg-white/10"}`} />
         ))}
       </div>
@@ -42,7 +50,10 @@ function CheckoutPage() {
                 <p className="text-sm font-medium">{product.title}</p>
                 <p className="text-muted-foreground text-[11px]">{product.provider}</p>
               </div>
-              <p className="font-display text-sm font-semibold">{product.price} MDMT</p>
+              <div className="text-right">
+                <p className="font-display text-sm font-semibold">{product.price} MDMT</p>
+                <p className="text-muted-foreground text-[10px]">≈ AED {(product.price * MDMT_TO_AED).toFixed(0)}</p>
+              </div>
             </div>
             <div className="mt-4 space-y-1.5 border-t border-white/10 pt-3 text-xs">
               <Row k="Subtotal" v={`${product.price} MDMT`} />
@@ -50,7 +61,6 @@ function CheckoutPage() {
               <Row k="Total" v={`${(product.price + 0.02).toFixed(2)} MDMT`} bold />
             </div>
           </div>
-          <p className="text-muted-foreground mt-3 text-[11px]">Wallet balance: {portfolio.available.toLocaleString()} MDMT</p>
           <button onClick={() => setStep(2)} className="bg-gradient-brand shadow-glow mt-6 w-full rounded-full py-3 text-sm font-semibold text-white">
             Continue
           </button>
@@ -59,15 +69,52 @@ function CheckoutPage() {
 
       {step === 2 && (
         <>
-          <p className="text-muted-foreground mt-5 text-[11px] uppercase tracking-wide">Confirm Payment</p>
-          <div className="bg-gradient-hero shadow-glow mt-2 rounded-3xl border border-white/10 p-5 text-center">
-            <p className="text-muted-foreground text-xs">You're paying</p>
-            <p className="font-display mt-2 text-4xl font-semibold">{product.price}</p>
-            <p className="text-muted-foreground text-xs">MDMT to {product.provider}</p>
+          <p className="text-muted-foreground mt-5 text-[11px] uppercase tracking-wide">Choose Payment Method</p>
+          <div className="mt-2 space-y-2">
+            {paymentMethods.map((p) => {
+              const active = p.id === method;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setMethod(p.id)}
+                  className={`bg-gradient-card flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-colors ${
+                    active ? "border-primary" : "border-white/10"
+                  }`}
+                >
+                  <span className="bg-gradient-brand-soft grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg">
+                    {p.emoji || <CreditCard size={16} />}
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{p.label}</p>
+                    <p className="text-muted-foreground text-[11px]">{p.blurb}</p>
+                  </div>
+                  <span
+                    className={`grid h-5 w-5 place-items-center rounded-full border ${
+                      active ? "border-primary bg-primary/15" : "border-white/15"
+                    }`}
+                  >
+                    {active && <Check size={12} className="text-primary" />}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-          <p className="text-muted-foreground mt-4 text-center text-xs">Transaction will be signed and broadcast.</p>
+          <div className="bg-gradient-card mt-4 rounded-2xl border border-white/10 p-4 text-xs">
+            <Row k="You pay" v={method === "mdmt" ? `${product.price} MDMT` : `AED ${aedAmount.toFixed(2)}`} bold />
+            {method !== "mdmt" && (
+              <>
+                <Row k="Conversion rate" v={`1 MDMT ≈ AED ${MDMT_TO_AED}`} />
+                <Row k="Processor fee" v={`${(pm.feePct * 100).toFixed(2)}%`} />
+              </>
+            )}
+            {method === "mdmt" && (
+              <p className="text-muted-foreground mt-2 text-[11px]">
+                Wallet balance: {portfolio.available.toLocaleString()} MDMT
+              </p>
+            )}
+          </div>
           <button onClick={() => setStep(3)} className="bg-gradient-brand shadow-glow mt-6 w-full rounded-full py-3 text-sm font-semibold text-white">
-            Sign & Pay
+            Continue with {pm.label}
           </button>
           <button onClick={() => setStep(1)} className="text-muted-foreground mt-2 w-full py-2 text-xs">Back</button>
         </>
@@ -75,19 +122,60 @@ function CheckoutPage() {
 
       {step === 3 && (
         <>
+          <p className="text-muted-foreground mt-5 text-[11px] uppercase tracking-wide">Confirm Payment</p>
+          <div className="bg-gradient-hero shadow-glow mt-2 rounded-3xl border border-white/10 p-5 text-center">
+            <p className="text-muted-foreground text-xs">You're paying</p>
+            <p className="font-display mt-2 text-4xl font-semibold">
+              {method === "mdmt" ? `${product.price} MDMT` : `AED ${aedAmount.toFixed(2)}`}
+            </p>
+            <p className="text-muted-foreground text-xs">to {product.provider} · via {pm.label}</p>
+          </div>
+          {method === "card" && (
+            <div className="bg-gradient-card mt-4 space-y-2 rounded-2xl border border-white/10 p-4 text-xs">
+              <Row k="Card" v="•••• 4242 (Visa)" mono />
+              <Row k="Holder" v="Arjun Mehta" />
+            </div>
+          )}
+          {(method === "applepay" || method === "googlepay") && (
+            <p className="text-muted-foreground mt-4 text-center text-xs">
+              Approve on your device to complete the payment.
+            </p>
+          )}
+          {method === "upi" && (
+            <div className="bg-gradient-card mt-4 rounded-2xl border border-white/10 p-4 text-xs">
+              <Row k="UPI ID" v="arjun@hdfcbank" mono />
+            </div>
+          )}
+          {method === "mdmt" && (
+            <p className="text-muted-foreground mt-4 text-center text-xs">
+              Transaction will be signed by your wallet and broadcast on-chain.
+            </p>
+          )}
+          <button onClick={() => setStep(4)} className="bg-gradient-brand shadow-glow mt-6 w-full rounded-full py-3 text-sm font-semibold text-white">
+            {method === "mdmt" ? "Sign & Pay" : "Authorize Payment"}
+          </button>
+          <button onClick={() => setStep(2)} className="text-muted-foreground mt-2 w-full py-2 text-xs">Back</button>
+        </>
+      )}
+
+      {step === 4 && (
+        <>
           <div className="bg-gradient-hero shadow-glow mt-6 rounded-3xl border border-white/10 p-6 text-center">
             <span className="bg-success/20 text-success mx-auto grid h-14 w-14 place-items-center rounded-2xl">
               <Check size={26} />
             </span>
             <p className="font-display mt-3 text-xl font-semibold">Payment Successful</p>
-            <p className="text-muted-foreground mt-1 text-xs">{product.title} · {product.price} MDMT</p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {product.title} · {method === "mdmt" ? `${product.price} MDMT` : `AED ${aedAmount.toFixed(2)}`}
+            </p>
           </div>
 
           <p className="text-muted-foreground mt-5 mb-2 text-[11px] uppercase tracking-wide">Receipt</p>
           <div className="bg-gradient-card space-y-2 rounded-2xl border border-white/10 p-4 text-xs">
             <Row k="Order number" v={orderNum} mono />
             <Row k="Reference ID" v={refId} mono />
-            <Row k="Transaction" v={<HashChip hash={txHash} full={txHash + "FULLHASH"} />} />
+            <Row k="Payment method" v={pm.label} />
+            <Row k="Transaction" v={<HashChip hash={txHash} full={fullHash} />} />
             <Row k="Status" v={<span className="text-success">Confirmed</span>} />
           </div>
 
