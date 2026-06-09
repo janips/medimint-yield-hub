@@ -88,7 +88,7 @@ function BucketPage() {
             />
             <Tile
               label="Yield (MDMT)"
-              live={<AnimatedNumber value={todayYield} decimals={3} />}
+              live={<AnimatedNumber value={sessionYield} decimals={3} />}
               accent
             />
           </div>
