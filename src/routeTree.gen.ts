@@ -94,19 +94,19 @@ const MarketplaceCheckoutProductIdRoute =
     getParentRoute: () => MarketplaceRoute,
   } as any)
 const AssetsMachinesMachineIdRoute = AssetsMachinesMachineIdRouteImport.update({
-  id: '/machines/$machineId',
-  path: '/machines/$machineId',
-  getParentRoute: () => AssetsRoute,
+  id: '/assets/machines/$machineId',
+  path: '/assets/machines/$machineId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AssetsIdsAssetIdRoute = AssetsIdsAssetIdRouteImport.update({
-  id: '/ids/$assetId',
-  path: '/ids/$assetId',
-  getParentRoute: () => AssetsRoute,
+  id: '/assets/ids/$assetId',
+  path: '/assets/ids/$assetId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AssetsBucketsBucketIdRoute = AssetsBucketsBucketIdRouteImport.update({
-  id: '/buckets/$bucketId',
-  path: '/buckets/$bucketId',
-  getParentRoute: () => AssetsRoute,
+  id: '/assets/buckets/$bucketId',
+  path: '/assets/buckets/$bucketId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ActivityEventEventIdRoute = ActivityEventEventIdRouteImport.update({
   id: '/event/$eventId',
@@ -244,6 +244,9 @@ export interface RootRouteChildren {
   StakingRoute: typeof StakingRoute
   TransparencyRoute: typeof TransparencyRoute
   AssetsIndexRoute: typeof AssetsIndexRoute
+  AssetsBucketsBucketIdRoute: typeof AssetsBucketsBucketIdRoute
+  AssetsIdsAssetIdRoute: typeof AssetsIdsAssetIdRoute
+  AssetsMachinesMachineIdRoute: typeof AssetsMachinesMachineIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -341,24 +344,24 @@ declare module '@tanstack/react-router' {
     }
     '/assets/machines/$machineId': {
       id: '/assets/machines/$machineId'
-      path: '/machines/$machineId'
+      path: '/assets/machines/$machineId'
       fullPath: '/assets/machines/$machineId'
       preLoaderRoute: typeof AssetsMachinesMachineIdRouteImport
-      parentRoute: typeof AssetsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/assets/ids/$assetId': {
       id: '/assets/ids/$assetId'
-      path: '/ids/$assetId'
+      path: '/assets/ids/$assetId'
       fullPath: '/assets/ids/$assetId'
       preLoaderRoute: typeof AssetsIdsAssetIdRouteImport
-      parentRoute: typeof AssetsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/assets/buckets/$bucketId': {
       id: '/assets/buckets/$bucketId'
-      path: '/buckets/$bucketId'
+      path: '/assets/buckets/$bucketId'
       fullPath: '/assets/buckets/$bucketId'
       preLoaderRoute: typeof AssetsBucketsBucketIdRouteImport
-      parentRoute: typeof AssetsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/activity/event/$eventId': {
       id: '/activity/event/$eventId'
@@ -408,6 +411,9 @@ const rootRouteChildren: RootRouteChildren = {
   StakingRoute: StakingRoute,
   TransparencyRoute: TransparencyRoute,
   AssetsIndexRoute: AssetsIndexRoute,
+  AssetsBucketsBucketIdRoute: AssetsBucketsBucketIdRoute,
+  AssetsIdsAssetIdRoute: AssetsIdsAssetIdRoute,
+  AssetsMachinesMachineIdRoute: AssetsMachinesMachineIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
