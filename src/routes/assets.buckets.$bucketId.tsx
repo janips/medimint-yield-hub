@@ -6,7 +6,11 @@ import { LiveActivityFeed } from "@/components/LiveActivityFeed";
 import { findBucket, machines, fmtMdmt } from "@/lib/mockData";
 import { useSim, machinesInBucket, type BucketKey } from "@/lib/simEngine";
 import { Cpu, Activity, ChevronRight, Layers, TrendingUp } from "lucide-react";
-
+function loadBucket({ params }: { params: { bucketId: string } }) {
+  const bucket = findBucket(params.bucketId);
+  if (!bucket) throw notFound();
+  return { bucket };
+}
 
 export const Route = createFileRoute("/assets/buckets/$bucketId")({
   head: ({ params }) => ({
@@ -15,11 +19,7 @@ export const Route = createFileRoute("/assets/buckets/$bucketId")({
       { name: "description", content: "Drill into the machines, transactions and yield inside this Asset Bucket." },
     ],
   }),
-  loader: ({ params }) => {
-    const bucket = findBucket(params.bucketId);
-    if (!bucket) throw notFound();
-    return { bucket };
-  },
+  loader: loadBucket,
   component: BucketPage,
   notFoundComponent: () => (
     <AppShell title="Bucket not found" back>
