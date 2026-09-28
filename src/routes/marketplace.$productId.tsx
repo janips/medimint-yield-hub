@@ -7,11 +7,7 @@ export const Route = createFileRoute("/marketplace/$productId")({
   head: ({ params }) => ({
     meta: [{ title: `Product — Medimint` }, { name: "description", content: `Buy ${params.productId} with MDMT.` }],
   }),
-  loader: ({ params }) => {
-    const product = findProduct(params.productId);
-    if (!product) throw notFound();
-    return { product };
-  },
+  loader: loadProduct,
   component: ProductDetail,
   errorComponent: ({ error }) => <div className="p-8 text-sm">{error.message}</div>,
   notFoundComponent: () => <AppShell title="Not found" back><p className="text-muted-foreground mt-6 text-sm">Product unavailable.</p></AppShell>,
