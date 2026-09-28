@@ -12,6 +12,7 @@ const items: { to: string; label: string; icon: typeof Home; exact?: boolean }[]
   { to: "/staking", label: "Staking", icon: Coins },
   { to: "/marketplace", label: "Marketplace", icon: ShoppingBag },
   { to: "/rewards", label: "Rewards", icon: Gift },
+  { to: "/affiliates", label: "Affiliates", icon: Users },
   { to: "/transparency", label: "Transparency Hub", icon: ShieldCheck },
   { to: "/notifications", label: "Reports", icon: FileText },
   { to: "/profile", label: "Profile", icon: User },
