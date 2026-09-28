@@ -4,15 +4,17 @@ import { HashChip } from "@/components/HashChip";
 import { findEvent } from "@/lib/mockData";
 import { Sparkles, ChevronRight } from "lucide-react";
 
+function loadEvent({ params }: { params: { eventId: string } }) {
+  const event = findEvent(params.eventId);
+  if (!event) throw notFound();
+  return { event };
+}
+
 export const Route = createFileRoute("/activity/event/$eventId")({
   head: ({ params }) => ({
     meta: [{ title: `Event ${params.eventId} — Medimint` }],
   }),
-  loader: ({ params }) => {
-    const event = findEvent(params.eventId);
-    if (!event) throw notFound();
-    return { event };
-  },
+  loader: loadEvent,
   component: EventDetail,
   errorComponent: ({ error }) => <div className="p-8 text-sm">{error.message}</div>,
   notFoundComponent: () => (
