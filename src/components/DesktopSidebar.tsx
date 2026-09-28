@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Home, Layers, Activity, ShoppingBag, Gift, Coins,
-  ShieldCheck, FileText, Settings as SettingsIcon, User,
+  ShieldCheck, FileText, Settings as SettingsIcon, User, Users,
 } from "lucide-react";
 import { BrandLogo } from "./BrandLogo";
 
@@ -12,6 +12,7 @@ const items: { to: string; label: string; icon: typeof Home; exact?: boolean }[]
   { to: "/staking", label: "Staking", icon: Coins },
   { to: "/marketplace", label: "Marketplace", icon: ShoppingBag },
   { to: "/rewards", label: "Rewards", icon: Gift },
+  { to: "/affiliates", label: "Affiliates", icon: Users },
   { to: "/transparency", label: "Transparency Hub", icon: ShieldCheck },
   { to: "/notifications", label: "Reports", icon: FileText },
   { to: "/profile", label: "Profile", icon: User },

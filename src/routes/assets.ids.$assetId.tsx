@@ -5,6 +5,12 @@ import { HashChip } from "@/components/HashChip";
 import { findAsset, eventsForAsset, findMachine } from "@/lib/mockData";
 import { Layers, ChevronRight, Sparkles, ShieldCheck } from "lucide-react";
 
+function loadAsset({ params }: { params: { assetId: string } }) {
+  const asset = findAsset(params.assetId);
+  if (!asset) throw notFound();
+  return { asset };
+}
+
 export const Route = createFileRoute("/assets/ids/$assetId")({
   head: ({ params }) => ({
     meta: [
@@ -12,11 +18,7 @@ export const Route = createFileRoute("/assets/ids/$assetId")({
       { name: "description", content: `Token allocation, yield history, and blockchain log for ${params.assetId}.` },
     ],
   }),
-  loader: ({ params }) => {
-    const asset = findAsset(params.assetId);
-    if (!asset) throw notFound();
-    return { asset };
-  },
+  loader: loadAsset,
   component: AssetDetailPage,
   errorComponent: ({ error, reset }) => {
     const router = useRouter();
