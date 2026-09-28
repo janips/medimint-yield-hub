@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Home, Layers, Activity, ShoppingBag, Gift, Coins,
-  ShieldCheck, FileText, Settings as SettingsIcon, User,
+  ShieldCheck, FileText, Settings as SettingsIcon, User, Users,
 } from "lucide-react";
 import { BrandLogo } from "./BrandLogo";
 
