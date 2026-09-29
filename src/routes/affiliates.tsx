@@ -2,10 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Users, ChevronRight, ChevronDown, Copy, Check, Share2, Coins,
-  TrendingUp, Layers, Percent, UserPlus,
+  TrendingUp, Layers, Percent, UserPlus, Crown,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { HashChip } from "@/components/HashChip";
+import { Button } from "@/components/ui/button";
 import {
   affiliateTree, commissionTiers, commissionLedger, networkStats,
   referralCode, referralLink, referralSteps, type Referral,
@@ -55,7 +56,7 @@ function AffiliatesPage() {
             />
           </div>
 
-          <section className="bg-card/50 rounded-3xl border border-white/10 p-5">
+          <section className="bg-card/50 overflow-hidden rounded-3xl border border-white/10 p-5">
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-semibold">Referral tree</h2>
@@ -66,23 +67,7 @@ function AffiliatesPage() {
               <Layers size={16} className="text-muted-foreground" />
             </div>
 
-            <div className="mb-3 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
-              <div className="bg-gradient-brand grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-bold text-white">
-                {initials(affiliateTree.name)}
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold">{affiliateTree.name} · You</p>
-                <p className="text-muted-foreground text-[11px]">
-                  {affiliateTree.id} · {affiliateTree.stakedMdmt.toLocaleString()} MDMT staked
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              {affiliateTree.children.map((child) => (
-                <TreeNode key={child.id} node={child} level={1} />
-              ))}
-            </div>
+            <ReferralTree root={affiliateTree} />
           </section>
 
           <section className="bg-card/50 rounded-3xl border border-white/10 p-5">
@@ -135,52 +120,124 @@ function AffiliatesPage() {
   );
 }
 
-function TreeNode({ node, level }: { node: Referral; level: number }) {
-  const [open, setOpen] = useState(level < 2);
-  const hasChildren = node.children.length > 0;
+function ReferralTree({ root }: { root: Referral }) {
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const toggle = (id: string) => {
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const [vicky, tony, ramesh] = root.children;
+  if (!vicky || !tony || !ramesh) return null;
+  const vickyChildren = collapsed.has(vicky.id) ? [] : vicky.children;
+  const tonyChildren = collapsed.has(tony.id) ? [] : tony.children;
+  const neha = vicky.children[0];
+  const levelThree = neha && !collapsed.has(vicky.id) && !collapsed.has(neha.id) ? neha.children : [];
 
   return (
-    <div>
-      <div
-        className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5"
-        style={{ marginLeft: `${(level - 1) * 16}px` }}
-      >
-        <button
-          onClick={() => setOpen((o) => !o)}
-          disabled={!hasChildren}
-          aria-label={hasChildren ? (open ? "Collapse" : "Expand") : "No referrals"}
-          className="text-muted-foreground hover:text-foreground grid h-6 w-6 shrink-0 place-items-center rounded-lg border border-white/10 disabled:opacity-25"
-        >
-          {open ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-        </button>
-        <div className="bg-card grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/10 text-[10px] font-semibold">
-          {initials(node.name)}
+    <div className="no-scrollbar overflow-x-auto pb-2">
+      <div className="mx-auto min-w-[720px]">
+        <div className="flex flex-col items-center pt-3">
+          <div className="relative">
+            <Crown className="text-warning absolute -top-5 left-1/2 -translate-x-1/2" size={20} />
+            <div className="bg-gradient-brand grid h-16 w-16 place-items-center rounded-full border-4 border-card text-base font-bold text-primary-foreground shadow-glow">
+              {initials(root.name)}
+            </div>
+          </div>
+          <p className="mt-2 text-sm font-semibold">{root.name} · You</p>
+          <p className="text-muted-foreground text-[10px]">Level 0 · {root.stakedMdmt.toLocaleString()} MDMT staked</p>
+          <div className="bg-success/60 mt-2 h-5 w-px" />
+          <div className="bg-success/60 h-px w-[66%]" />
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-medium">{node.name}</p>
-          <p className="text-muted-foreground truncate text-[10px]">
-            L{level} · {node.id} · joined {node.joined}
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-[11px] font-semibold">{node.stakedMdmt.toLocaleString()} MDMT</p>
-          <p className={`text-[10px] ${node.status === "active" ? "text-success" : "text-warning"}`}>
-            {node.status === "active" ? `+${node.commissionMdmt.toLocaleString()} earned` : "Pending"}
-          </p>
-        </div>
-        <span className="text-muted-foreground hidden shrink-0 rounded-full border border-white/10 px-2 py-0.5 text-[10px] sm:inline">
-          {node.children.length} ref
-        </span>
-      </div>
-      {hasChildren && open && (
-        <div className="mt-1.5 space-y-1.5">
-          {node.children.map((c) => (
-            <TreeNode key={c.id} node={c} level={level + 1} />
+
+        <LevelBand label="Level 1" detail="Direct referrals" tone="success">
+          {[vicky, tony, ramesh].map((node) => (
+            <div key={node.id} className="relative flex justify-center before:absolute before:-top-4 before:h-4 before:w-px before:bg-success/60">
+              <MemberNode node={node} level={1} collapsed={collapsed.has(node.id)} onToggle={() => toggle(node.id)} />
+            </div>
+          ))}
+        </LevelBand>
+
+        <div className="grid grid-cols-3 px-24">
+          {[vicky, tony, ramesh].map((node) => (
+            <div key={node.id} className={`mx-auto h-5 w-px ${collapsed.has(node.id) || !node.children.length ? "bg-transparent" : "bg-primary/60"}`} />
           ))}
         </div>
-      )}
+        <LevelBand label="Level 2" detail="Extended network" tone="primary">
+          <div className="grid grid-cols-2 gap-2">
+            {vickyChildren.map((node) => <MemberNode key={node.id} node={node} level={2} collapsed={collapsed.has(node.id)} onToggle={() => toggle(node.id)} compact />)}
+            {!vickyChildren.length && <EmptyBranch label={collapsed.has(vicky.id) ? "Branch collapsed" : "No referrals"} />}
+          </div>
+          <div className="flex justify-center">
+            {tonyChildren.map((node) => <MemberNode key={node.id} node={node} level={2} collapsed={collapsed.has(node.id)} onToggle={() => toggle(node.id)} compact />)}
+            {!tonyChildren.length && <EmptyBranch label={collapsed.has(tony.id) ? "Branch collapsed" : "No referrals"} />}
+          </div>
+          <EmptyBranch label="No referrals yet" />
+        </LevelBand>
+
+        {levelThree.length > 0 && (
+          <>
+            <div className="ml-[25%] h-5 w-px bg-accent/60" />
+            <LevelBand label="Level 3" detail="Third generation" tone="accent">
+              <div className="col-span-3 flex justify-start pl-[12%]">
+                {levelThree.map((node) => <MemberNode key={node.id} node={node} level={3} compact />)}
+              </div>
+            </LevelBand>
+          </>
+        )}
+      </div>
     </div>
   );
+}
+
+function LevelBand({ label, detail, tone, children }: { label: string; detail: string; tone: "success" | "primary" | "accent"; children: React.ReactNode }) {
+  const toneClass = tone === "success" ? "border-success/20 bg-success/5 text-success" : tone === "primary" ? "border-primary/20 bg-primary/5 text-primary" : "border-accent/20 bg-accent/5 text-accent";
+  return (
+    <div className={`grid grid-cols-[104px_1fr] items-center rounded-2xl border p-3 ${toneClass}`}>
+      <div>
+        <p className="text-xs font-bold">{label}</p>
+        <p className="text-muted-foreground text-[9px]">{detail}</p>
+      </div>
+      <div className="grid grid-cols-3 items-start gap-4 text-foreground">{children}</div>
+    </div>
+  );
+}
+
+function MemberNode({ node, level, collapsed = false, onToggle, compact = false }: { node: Referral; level: number; collapsed?: boolean; onToggle?: () => void; compact?: boolean }) {
+  const hasChildren = node.children.length > 0;
+  return (
+    <div className="group min-w-0 text-center">
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        disabled={!hasChildren}
+        onClick={onToggle}
+        aria-label={hasChildren ? `${collapsed ? "Expand" : "Collapse"} ${node.name}'s referrals` : `${node.name} has no referrals`}
+        className={`${compact ? "h-10 w-10" : "h-12 w-12"} relative mx-auto rounded-full border border-border bg-card p-0 shadow-card hover:border-primary/50 hover:bg-muted disabled:opacity-100`}
+      >
+        <span className="text-[10px] font-bold">{initials(node.name)}</span>
+        {hasChildren && (
+          <span className="absolute -bottom-1 -right-1 grid h-4 w-4 place-items-center rounded-full border border-border bg-background text-muted-foreground">
+            {collapsed ? <ChevronRight size={9} /> : <ChevronDown size={9} />}
+          </span>
+        )}
+      </Button>
+      <p className="mt-1 truncate text-[10px] font-semibold">{node.name}</p>
+      <p className="text-muted-foreground text-[9px]">L{level} · {node.stakedMdmt.toLocaleString()} MDMT</p>
+      <p className={`text-[9px] ${node.status === "active" ? "text-success" : "text-warning"}`}>
+        {node.status === "active" ? `+${node.commissionMdmt.toLocaleString()} earned` : "Pending"}
+      </p>
+    </div>
+  );
+}
+
+function EmptyBranch({ label }: { label: string }) {
+  return <div className="text-muted-foreground flex min-h-16 items-center justify-center text-[9px]">{label}</div>;
 }
 
 function CommissionPanel() {
