@@ -12,11 +12,11 @@ export interface Referral {
 }
 
 export const commissionTiers: { level: string; label: string; rate: number }[] = [
-  { level: "Level 1", label: "Direct referral", rate: 5 },
-  { level: "Level 2", label: "2nd level", rate: 2 },
-  { level: "Level 3", label: "3rd level", rate: 1 },
-  { level: "Level 4", label: "4th level", rate: 1 },
-  { level: "Level 5", label: "5th level", rate: 1 },
+  { level: "Level 1", label: "Direct referral", rate: 2 },
+  { level: "Level 2", label: "2nd level", rate: 1 },
+  { level: "Level 3", label: "3rd level", rate: 0.75 },
+  { level: "Level 4", label: "4th level", rate: 0.5 },
+  { level: "Level 5", label: "5th level", rate: 0.25 },
 ];
 
 export const referralSteps: { title: string; detail: string }[] = [
