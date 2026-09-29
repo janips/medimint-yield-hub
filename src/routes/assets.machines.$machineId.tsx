@@ -9,6 +9,12 @@ import { useLiveYield } from "@/lib/liveYield";
 import { useSim } from "@/lib/simEngine";
 import { Cpu, MapPin, Activity, Download, ChevronRight, ShieldCheck, Sparkles, CalendarClock, Hash, TrendingUp, PieChart, Factory, Users, Coins, Gift, Clock, Plus, History, BarChart3 } from "lucide-react";
 
+function loadMachine({ params }: { params: { machineId: string } }) {
+  const machine = findMachine(params.machineId);
+  if (!machine) throw notFound();
+  return { machine };
+}
+
 export const Route = createFileRoute("/assets/machines/$machineId")({
   head: ({ params }) => ({
     meta: [
@@ -16,11 +22,7 @@ export const Route = createFileRoute("/assets/machines/$machineId")({
       { name: "description", content: `Live performance, yield events, and blockchain audit for ${params.machineId}.` },
     ],
   }),
-  loader: ({ params }) => {
-    const machine = findMachine(params.machineId);
-    if (!machine) throw notFound();
-    return { machine };
-  },
+  loader: loadMachine,
   component: MachineDetailPage,
   errorComponent: ({ error, reset }) => {
     const router = useRouter();
